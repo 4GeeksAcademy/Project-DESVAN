@@ -11,11 +11,6 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
-from api.custom_routes.test import *
-from api.custom_routes.event import *
-from api.custom_routes.user import *
-from api.custom_routes.category import*
-from api.custom_routes.event_category import*
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
