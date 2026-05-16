@@ -17,6 +17,7 @@ from api.custom_routes.user import *
 from api.custom_routes.category import*
 from api.custom_routes.profile import *
 from api.custom_routes.favorite import *
+from api.custom_routes.reservation import *
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
