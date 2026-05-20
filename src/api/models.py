@@ -140,7 +140,7 @@ class Event (db.Model): #ESTA TABLA DEBE IR ARRIBA?
     image_url: Mapped[dict] = mapped_column(JSON, nullable= True)
     status: Mapped[EventStatus] = mapped_column(Enum(EventStatus), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
-    
+    # insertar columna de fecha de creación del evento? o se puede usar created_at para eso? creo que mejor created_at para la fecha de creación del evento, y si queremos una columna para la fecha de publicación, se puede agregar una columna published_at que se rellene cuando el evento cambie a estado activo.
     event_type: Mapped[EventType] = mapped_column(Enum(EventType), nullable=False)  # Punto 9: publico/privado
     start_time: Mapped[datetime]  = mapped_column(DateTime(timezone=True))
     end_time: Mapped[datetime]  = mapped_column(DateTime(timezone=True))
