@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import authService from "../services/auth.service";
 import "./Login.css";
+import { useEffect } from "react";
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { dispatch } = useGlobalReducer();
+  const { store, dispatch } = useGlobalReducer();
 
   // State to toggle between login and registration panels
   const [isRegister, setIsRegister] = useState(false);
@@ -16,7 +17,7 @@ export const Login = () => {
     username: "",
     email: "",
     password: "",
-    type:"login",
+    type: "login",
   });
 
   // UI States
@@ -39,87 +40,51 @@ export const Login = () => {
     setError(null);
     setLoading(true);
 
-    authService.auth(formData).then((data)=>{
+    authService.auth(formData).then((data) => {
       //Para register y autologin
-      if (formData.type === 'register'){
-                return authService.auth({...formData, type:'login'})
-            }
-            return data;
-        })
-        .then(data=>{
-            dispatch({
-                type: 'auth',
-                payload: {
-                    user: data.data
-                }
-            });
-
-            navigate('/explorar');
-        })
-        .catch((err)=> {
-          console.log(err);
-
-          setError( err.message || "Error inesperado.")
-
-        })
-        .finally(()=>{
-          setLoading(false);
+      if (formData.type === 'register') {
+        return authService.auth({ ...formData, type: 'login' })
+      }
+      return data;
+    })
+      .then(data => {
+        
+        dispatch({
+          type: 'auth',
+          payload: {
+            user: data.data
+          }
         });
 
-      };
-    
+        navigate('/explorar');
+      })
+      .catch((err) => {
+        console.log(err);
 
-    // try {
-    //   // Build payload for backend
-    //   const payload = {
-    //     email: formData.email,
-    //     password: formData.password,
-    //     type: isRegister ? "register" : "login",
-    //   };
+        setError(err.message || "Error inesperado.")
 
-    //   if (isRegister) {
-    //     payload.username = formData.username; // Required for backend registration
-    //   }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-    //   // Call central authentication service
-    //   const data = await authService.auth(payload);
+  };
 
-    //   if (isRegister) {
-    //     // Registration successful
-    //     // For convenience and smooth user flow, we can automatically switch to login form
-    //     // or auto-login if the backend returns access_token.
-    //     if (data.access_token) {
-    //       // If the backend returns access_token on register, log in immediately
-    //       dispatch({
-    //         type: "register", // Action name from storeReducer that handles logged-in state
-    //         payload: { user: data.data || { email: formData.email, username: formData.username } },
-    //       });
-    //       navigate("/explorar");
-    //     } else {
-    //       // Switch to login form with clean data and success feedback
-    //       setIsRegister(false);
-    //       setError("¡Registro completado! Por favor, inicia sesión con tus credenciales.");
-    //       setFormData({
-    //         username: "",
-    //         email: formData.email,
-    //         password: "",
-    //       });
-    //     }
-    //   } else {
-    //     // Login successful
-    //     dispatch({
-    //       type: "register", // In storeReducer, 'register' is used to set authenticated state
-    //       payload: { user: data.data },
-    //     });
-    //     navigate("/explorar");
-    //   }
-    // } catch (err) {
-    //   console.error(err);
-    //   setError(err.message || "Ocurrió un error inesperado al procesar tu solicitud.");
-    // } finally {
-    //   setLoading(false);
-    // }
- // };
+
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      if (!store.user) {
+        authService.getMe().then(data => dispatch({
+          type: 'auth',
+          payload: {
+            user: data.data
+          }
+        })).catch(err => console.log(err));
+      }
+      navigate('/explorar');
+    }
+  }, [store.auth, navigate]);
 
   // Toggle state between Login and Register
   const handleToggleMode = () => {
@@ -135,11 +100,11 @@ export const Login = () => {
 
   return (
     <div className={`auth-page-container ${isRegister ? "register-mode" : ""}`}>
-      
+
       {/* 1. DECORATIVE SIDEBAR (Sliding / Vintage Theme) */}
       <div className="auth-sidebar">
         {/* Background Paper Texture Overlay is handled in CSS */}
-        
+
         {/* Vintage Postmark Stamp */}
         <div className="vintage-postmark">
           <div className="stamp-circle">
@@ -186,7 +151,7 @@ export const Login = () => {
             )}
           </div>
         </div>
-        
+
         {/* Torn Paper Boundary Effect */}
         <div className="torn-paper-edge"></div>
       </div>
@@ -194,7 +159,7 @@ export const Login = () => {
       {/* 2. FORM PANEL AREA (Holds the Floating Premium Form Card) */}
       <div className="auth-form-area">
         <div className="auth-card">
-          
+
           {/* Brand Icon Header */}
           <div className="brand-header">
             <div className="brand-box-icon">
@@ -322,7 +287,7 @@ export const Login = () => {
               </div>
               <p>Tus datos siempre protegidos</p>
             </div>
-            
+
             <div className="value-prop">
               <div className="value-prop-header">
                 <i className="fa-solid fa-cube val-icon"></i>

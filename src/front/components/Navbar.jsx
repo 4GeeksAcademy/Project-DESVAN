@@ -3,10 +3,29 @@ import desvanLogo from "../assets/img/desvanlogonav.png";
 import create_ico from "../assets/img/create_ico.png";
 import favorites_ico from "../assets/img/favorites_ico1.png";
 import user_ico from "../assets/img/profile_ico+.png";
+import authService from "../services/auth.service";
+import { useEffect } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer";
+
 
 export const Navbar = () => {
 	const location = useLocation();
-	const isAuthenticated = !!localStorage.getItem("token");
+	
+
+    const { store, dispatch } = useGlobalReducer();
+
+    useEffect(() => {
+        if (localStorage.getItem('token') && !store.user) {
+            authService.getMe().then(data => dispatch({
+                type: 'auth',
+                payload: {
+                    user: data.data
+                }
+            }))
+        }
+    }, [store.auth])
+
+	console.log(store.user)
 
 	return (
 		<nav className="custom-navbar">
@@ -21,13 +40,13 @@ export const Navbar = () => {
 					<input type="text" placeholder="Buscar rastros, ferias, antigüedades..." />
 				</div>
 				<div className="nav-actions">
-					<Link to={isAuthenticated ? "/favoritos" : "/login"}>
+					<Link to={store.user ? "/favoritos" : "/login"}>
 						<img src={favorites_ico} alt="favorites" className="favorites_ico"/>
 					</Link>
-					<Link to={isAuthenticated ? "/perfil" : "/login"}>
+					<Link to={store.user ? "/perfil" : "/login"}>
 						<img src={user_ico} alt="user" className="user_ico"/>
 					</Link>
-					<Link to={isAuthenticated ? "/crear-evento" : "/login"} style={{ textDecoration: 'none' }}>
+					<Link to={store.user ? "/crear-evento" : "/login"} style={{ textDecoration: 'none' }}>
 						<button className="btn-primary-custom">
 							<img src={create_ico} alt="sdsdsd" className="ico_create"/> Crear evento
 						</button>
