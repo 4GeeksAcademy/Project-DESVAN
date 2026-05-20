@@ -1,7 +1,7 @@
 export const initialStore=()=>{
   return{
     message: null,
-    register: localStorage.getItem('token') || false,
+    auth: localStorage.getItem('token') || false,
     todos: [
       {
         id: 1,
