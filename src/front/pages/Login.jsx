@@ -48,6 +48,7 @@ export const Login = () => {
       return data;
     })
       .then(data => {
+        
         dispatch({
           type: 'auth',
           payload: {
@@ -72,16 +73,18 @@ export const Login = () => {
 
 
   useEffect(() => {
-    if (localStorage.getItem('token') && !store.user) {
-      authService.getMe().then(data => dispatch({
-        type: 'auth',
-        payload: {
-          user: data.data
-        }
-      }))
+    if (localStorage.getItem('token')) {
+      if (!store.user) {
+        authService.getMe().then(data => dispatch({
+          type: 'auth',
+          payload: {
+            user: data.data
+          }
+        })).catch(err => console.log(err));
+      }
+      navigate('/explorar');
     }
-    if (!localStorage.getItem('token')) navigate('/')
-  }, [store.auth])
+  }, [store.auth, navigate]);
 
   // Toggle state between Login and Register
   const handleToggleMode = () => {

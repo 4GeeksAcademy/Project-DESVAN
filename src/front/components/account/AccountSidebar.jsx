@@ -1,4 +1,6 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import useGlobalReducer from "../../hooks/useGlobalReducer";
+import authService from "../../services/auth.service";
 
 const NAV_ITEMS = [
 	{ to: "/mis-eventos", label: "Mis Eventos", icon: "fa-solid fa-table-cells-large" },
@@ -8,6 +10,15 @@ const NAV_ITEMS = [
 ];
 
 export const AccountSidebar = () => {
+	const { dispatch } = useGlobalReducer();
+	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		authService.logout();
+		dispatch({ type: "logout" });
+		navigate("/");
+	};
+
 	return (
 		<div className="account-sidebar-wrap">
 		<aside className="account-sidebar">
@@ -43,7 +54,7 @@ export const AccountSidebar = () => {
 				<Link to="/explorar" className="account-btn-explore">
 					VOLVER A EXPLORAR
 				</Link>
-				<button type="button" className="account-btn-logout">
+				<button type="button" className="account-btn-logout" onClick={handleLogout}>
 					<i className="fa-solid fa-right-from-bracket" />
 					Cerrar sesión
 				</button>

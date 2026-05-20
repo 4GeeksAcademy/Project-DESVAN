@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import mascotOpen from "../assets/img/caja04.png";
 
 const CATEGORIES = [
@@ -18,6 +18,10 @@ const EVENT_TYPES = [
 ];
 
 export const CreateEvent = () => {
+    if (!localStorage.getItem('token')) {
+        return <Navigate to="/login" replace />;
+    }
+
     const [form, setForm] = useState({
         name: "",
         type: "",

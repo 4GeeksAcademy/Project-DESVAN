@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import desvanLogo from "../assets/img/desvanlogonav.png";
 import create_ico from "../assets/img/create_ico.png";
 import favorites_ico from "../assets/img/favorites_ico1.png";
@@ -11,7 +11,6 @@ import useGlobalReducer from "../hooks/useGlobalReducer";
 export const Navbar = () => {
 	const location = useLocation();
 	
-	const navigate = useNavigate()
 
     const { store, dispatch } = useGlobalReducer();
 
@@ -24,8 +23,9 @@ export const Navbar = () => {
                 }
             }))
         }
-        if (!localStorage.getItem('token')) navigate('/')
     }, [store.auth])
+
+	console.log(store.user)
 
 	return (
 		<nav className="custom-navbar">

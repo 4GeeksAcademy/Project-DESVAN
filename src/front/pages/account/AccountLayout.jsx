@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import ScrollToTop from "../../components/ScrollToTop";
 import { Navbar } from "../../components/Navbar";
 import { AccountSidebar } from "../../components/account/AccountSidebar";
@@ -6,6 +6,11 @@ import { PageTransition } from "../../components/PageTransition";
 import "./account.css";
 
 export const AccountLayout = () => {
+	const token = localStorage.getItem('token');
+	if (!token) {
+		return <Navigate to="/login" replace />;
+	}
+
 	return (
 		<ScrollToTop>
 			<div className="account-page">
