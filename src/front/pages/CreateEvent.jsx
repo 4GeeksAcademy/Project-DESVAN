@@ -30,6 +30,8 @@ export const CreateEvent = () => {
         event_type: "",
         start_time: "",
         end_time: "",
+        start_date: "",
+        end_date: "",
         latitude: "",
         longitude: "",
         exact_address: "",
@@ -236,8 +238,8 @@ export const CreateEvent = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        name="startDate"
-                                        value={eventData.startDate} 
+                                        name="start_date"
+                                        value={eventData.start_date} 
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -247,8 +249,8 @@ export const CreateEvent = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        name="endDate"
-                                        value={eventData.endDate}
+                                        name="end_date"
+                                        value={eventData.end_date}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -259,8 +261,8 @@ export const CreateEvent = () => {
                                     <label>Hora de inicio</label>
                                     <input
                                         type="time"
-                                        name="startTime"
-                                        value={eventData.startTime}
+                                        name="start_time"
+                                        value={eventData.start_time}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -268,22 +270,22 @@ export const CreateEvent = () => {
                                     <label>Hora de fin</label>
                                     <input
                                         type="time"
-                                        name="endTime"
-                                        value={eventData.endTime}
+                                        name="end_time"
+                                        value={eventData.end_time}
                                         onChange={handleChange}
                                     />
                                 </div>
                             </div>
 
-                            <label className="checkbox-inline">
+                            {/*<label className="checkbox-inline">
                                 <input
                                     type="checkbox"
                                     name="multiDay"
-                                    checked={eventData.multiDay}
+                                    checked={eventData.multiDay}          QUITAR NO TENEMOS OPCIÓN MULTIDAY
                                     onChange={handleChange}
                                 />
                                 <span>Evento de varios días</span>
-                            </label>
+                            </label>*/}
                         </div>
 
                         {/* Categoría y etiquetas */}
