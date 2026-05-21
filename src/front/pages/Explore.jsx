@@ -1,5 +1,6 @@
 import { useState } from "react";
 import caja05 from "../assets/img/caja05.png";
+import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import eventService from "../services/event.service";
 
@@ -204,6 +205,9 @@ export const Explore = () => {
                                 <div className="event-card-body">
                                     <h3 className="event-card-title">{event.title}</h3>
                                     <p className="event-card-desc">{event.description}</p>
+                                    <Link to={`/detalles/${event.id}`}>
+                                        <button className="btn-ver-rastro">Ver rastro</button>
+                                    </Link>
                                     <p className="event-card-desc">{event.city}</p>
                                     <button className="btn-ver-rastro">Ver rastro</button>
                                 </div>
