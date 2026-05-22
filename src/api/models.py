@@ -138,7 +138,7 @@ class Event (db.Model): #ESTA TABLA DEBE IR ARRIBA?
     title: Mapped[str] = mapped_column(String(255), nullable= False)
     description: Mapped[str] = mapped_column(Text, nullable= True)
     image_url: Mapped[dict] = mapped_column(JSON, nullable= True)
-    status: Mapped[EventStatus] = mapped_column(Enum(EventStatus), nullable=False)
+    status: Mapped[EventStatus] = mapped_column(Enum(EventStatus), default="active", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     event_type: Mapped[EventType] = mapped_column(Enum(EventType), nullable=False) 
@@ -207,7 +207,7 @@ class Event (db.Model): #ESTA TABLA DEBE IR ARRIBA?
             "description": self.description,
             "event_type": self.event_type.value,
             "latitude": self.latitude,
-            "longitude": self.longitude,
+            "longitude": self.longitude, 
             "exact_address":self.exact_address,
             "place": self.place,
             "city": self.city,

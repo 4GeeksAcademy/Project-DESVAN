@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import mascotOpen from "../assets/img/caja04.png";
 import eventService from "../services/event.service";
+import { getCoordinates } from "../services/geocoding.service";
 
 const CATEGORIES = [
     { value: "", label: "Selecciona una categoría" },
@@ -19,6 +20,8 @@ const EVENT_TYPES = [
 ];
 
 export const CreateEvent = () => {
+    const navigate = useNavigate();
+
     if (!localStorage.getItem('token')) {
         return <Navigate to="/login" replace />;
     }
@@ -26,19 +29,21 @@ export const CreateEvent = () => {
     const [eventData, setEventData] = useState({
         title: "",
         description: "",
-        status: "", // tengo que rellenarlo como activo yo?
         event_type: "",
         start_time: "",
         end_time: "",
         start_date: "",
         end_date: "",
+
         latitude: "",
         longitude: "",
+
         exact_address: "",
         city: "",
         place: "",
         max_capacity: "",
         postal_code: "",
+
         seller_id: "",
     });
 
@@ -66,19 +71,57 @@ export const CreateEvent = () => {
         setImages((prev) => [...prev, ...newImages].slice(0, 5));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        eventService.createEvent(eventData)
-            .then((data) => {
-                console.log("Evento creado:", data);
-                
-            })
-            .catch((err) => {
-                console.error("Error al crear el evento:", err);
-                
-            });
-        
+
+        try {
+            if (!eventData.city || !eventData.place) {
+                alert("Debes completar lugar y ciudad para crear el evento.");
+                return;
+            }
+
+            if (!eventData.start_date || !eventData.end_date || !eventData.start_time || !eventData.end_time) {
+                alert("Debes completar fecha y hora de inicio y fin.");
+                return;
+            }
+
+            const addressToUse =
+                eventData.exact_address?.trim() ||
+                `${eventData.place.trim()}, ${eventData.city.trim()}`;
+
+            const coords = await getCoordinates(addressToUse, eventData.city);
+
+            console.log("COORDS FINAL:", coords);
+
+            const payload = {
+                ...eventData,
+                start_time: `${eventData.start_date}T${eventData.start_time}`,
+                end_time: `${eventData.end_date}T${eventData.end_time}`,
+                exact_address: addressToUse,
+                latitude: coords.lat,
+                longitude: coords.lon,
+            };
+
+            delete payload.seller_id;
+
+            const data = await eventService.createEvent(payload);
+
+            console.log("Evento creado:", data);
+
+            if (data?.success && data?.data) {
+                navigate(`/detalles/${data.data}`);
+                return;
+            }
+
+            alert("Evento creado, pero no se pudo navegar automáticamente.");
+
+        } catch (err) {
+            console.error("Error geocoding o creando evento:", err);
+            alert("Error creando evento. Revisa la consola para más detalles.");
+        }
     };
+
+
 
     return (
         <div className="create-event-page">
@@ -239,7 +282,7 @@ export const CreateEvent = () => {
                                     <input
                                         type="date"
                                         name="start_date"
-                                        value={eventData.start_date} 
+                                        value={eventData.start_date}
                                         onChange={handleChange}
                                     />
                                 </div>
