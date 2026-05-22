@@ -208,8 +208,6 @@ export const Explore = () => {
                                     <Link to={`/detalles/${event.id}`}>
                                         <button className="btn-ver-rastro">Ver rastro</button>
                                     </Link>
-                                    <p className="event-card-desc">{event.city}</p>
-                                    <button className="btn-ver-rastro">Ver rastro</button>
                                 </div>
                             </div>
                         ))}

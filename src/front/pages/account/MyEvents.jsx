@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AccountPageHeader } from "../../components/account/AccountPageHeader";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import eventService from "../../services/event.service";
@@ -32,6 +33,7 @@ export const MyEvents = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const { store } = useGlobalReducer();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchUserEvents = async () => {
@@ -103,6 +105,28 @@ export const MyEvents = () => {
 			month: "short",
 			year: "numeric",
 		});
+	};
+
+	// Editar: navegar a formulario de creación con query param eventId
+	const handleEdit = (event) => {
+		navigate(`/crear-evento?eventId=${event.id}`);
+	};
+
+	// Eliminar: confirmar y llamar al servicio, actualizar UI
+	const handleDelete = async (eventId) => {
+		const confirmed = window.confirm("¿Eliminar este evento?");
+		if (!confirmed) return;
+		try {
+			setLoading(true);
+			const resp = await eventService.deleteEvent(eventId);
+			if (resp === false) throw new Error("Error al eliminar");
+			setUserEvents((prev) => prev.filter((e) => e.id !== eventId));
+		} catch (err) {
+			console.error(err);
+			alert("No se pudo eliminar el evento");
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -191,6 +215,7 @@ export const MyEvents = () => {
 												className="events-table-action-btn"
 												aria-label="edit"
 												title="Editar"
+												onClick={() => handleEdit(event)}
 											>
 												<i className={ACTION_ICONS["edit"]} />
 											</button>
@@ -199,6 +224,7 @@ export const MyEvents = () => {
 												className="events-table-action-btn"
 												aria-label="delete"
 												title="Eliminar"
+												onClick={() => handleDelete(event.id)}
 											>
 												<i className={ACTION_ICONS["delete"]} />
 											</button>
@@ -213,3 +239,5 @@ export const MyEvents = () => {
 		</div>
 	);
 };
+
+

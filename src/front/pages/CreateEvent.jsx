@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import mascotOpen from "../assets/img/caja04.png";
 import eventService from "../services/event.service";
 
@@ -44,6 +44,28 @@ export const CreateEvent = () => {
 
     const [images, setImages] = useState([]);
     const [mainImage, setMainImage] = useState(null);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const eventId = params.get('eventId');
+        if (eventId) {
+            // cargar evento para editar
+            eventService.getEvent(eventId).then((res) => {
+                const evt = res && res.data ? res.data : res;
+                if (evt) {
+                    setEventData((prev) => ({ ...prev, ...evt }));
+                    setIsEdit(true);
+                    setEditingId(eventId);
+                }
+            }).catch((err) => {
+                console.error('Error cargando evento para editar', err);
+            });
+        }
+    }, [location.search]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -68,14 +90,27 @@ export const CreateEvent = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (isEdit && editingId) {
+            eventService.updateEvent(editingId, eventData)
+                .then((data) => {
+                    console.log('Evento actualizado:', data);
+                    navigate('/mis-eventos');
+                })
+                .catch((err) => {
+                    console.error('Error al actualizar el evento:', err);
+                    alert('No se pudo actualizar el evento');
+                });
+            return;
+        }
+
         eventService.createEvent(eventData)
             .then((data) => {
                 console.log("Evento creado:", data);
-                
+                navigate('/mis-eventos');
             })
             .catch((err) => {
                 console.error("Error al crear el evento:", err);
-                
+                alert('No se pudo crear el evento');
             });
         
     };
@@ -457,7 +492,7 @@ export const CreateEvent = () => {
                     {/* Submit Button */}
                     <div className="create-event-submit">
                         <button type="submit" className="btn-publish">
-                            Publicar evento
+                            {isEdit ? 'Guardar cambios' : 'Publicar evento'}
                         </button>
                     </div>
                 </form>
