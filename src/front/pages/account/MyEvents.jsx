@@ -5,7 +5,7 @@ import useGlobalReducer from "../../hooks/useGlobalReducer";
 import eventService from "../../services/event.service";
 import authService from "../../services/auth.service";
 
-const TABS = ["TODOS", "ACTIVOS", "BORRADORES", "FINALIZADOS"];
+const TABS = ["TODOS", "ACTIVOS", "FINALIZADOS"];
 
 const ACTION_ICONS = {
 	edit: "fa-solid fa-pen",
@@ -16,15 +16,11 @@ const ACTION_ICONS = {
 const STATUS_MAP = {
 	active: "ACTIVO",
 	finished: "FINALIZADO",
-	cancelled: "CANCELADO",
-	draft: "BORRADOR",
 };
 
 const STATUS_VARIANT_MAP = {
 	active: "activo",
 	finished: "finalizado",
-	cancelled: "cancelado",
-	draft: "borrador",
 };
 
 export const MyEvents = () => {
@@ -32,6 +28,7 @@ export const MyEvents = () => {
 	const [userEvents, setUserEvents] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [eventToDelete, setEventToDelete] = useState(null);
 	const { store } = useGlobalReducer();
 	const navigate = useNavigate();
 
@@ -89,7 +86,6 @@ export const MyEvents = () => {
 			const eventStatus = STATUS_MAP[event.status];
 			if (activeTab === "ACTIVOS") return eventStatus === "ACTIVO";
 			if (activeTab === "FINALIZADOS") return eventStatus === "FINALIZADO";
-			if (activeTab === "BORRADORES") return eventStatus === "BORRADOR";
 			return false;
 		});
 	};
@@ -112,15 +108,14 @@ export const MyEvents = () => {
 		navigate(`/crear-evento?eventId=${event.id}`);
 	};
 
-	// Eliminar: confirmar y llamar al servicio, actualizar UI
+	// Eliminar: llamar al servicio y actualizar UI
 	const handleDelete = async (eventId) => {
-		const confirmed = window.confirm("¿Eliminar este evento?");
-		if (!confirmed) return;
 		try {
 			setLoading(true);
 			const resp = await eventService.deleteEvent(eventId);
 			if (resp === false) throw new Error("Error al eliminar");
 			setUserEvents((prev) => prev.filter((e) => e.id !== eventId));
+			setEventToDelete(null);
 		} catch (err) {
 			console.error(err);
 			alert("No se pudo eliminar el evento");
@@ -224,7 +219,7 @@ export const MyEvents = () => {
 												className="events-table-action-btn"
 												aria-label="delete"
 												title="Eliminar"
-												onClick={() => handleDelete(event.id)}
+												onClick={() => setEventToDelete(event)}
 											>
 												<i className={ACTION_ICONS["delete"]} />
 											</button>
@@ -236,8 +231,42 @@ export const MyEvents = () => {
 					</table>
 				)}
 			</div>
+			{eventToDelete && (
+				<div className="delete-event-backdrop" onClick={() => setEventToDelete(null)}>
+					<div className="delete-event-modal" onClick={(e) => e.stopPropagation()}>
+						<div className="delete-event-modal-header">
+							<h3>Eliminar evento</h3>
+							<button
+								type="button"
+								className="events-table-action-btn"
+								onClick={() => setEventToDelete(null)}
+								aria-label="Cerrar modal"
+							>
+								<i className="fa-solid fa-xmark" />
+							</button>
+						</div>
+						<p className="delete-event-modal-text">
+							¿Estás seguro de que quieres eliminar el evento <strong>{eventToDelete.title}</strong>? Esta acción no se puede deshacer.
+						</p>
+						<div className="delete-event-modal-actions">
+							<button
+								type="button"
+								className="delete-event-modal-btn delete-event-modal-btn--cancel"
+								onClick={() => setEventToDelete(null)}
+							>
+								Cancelar
+							</button>
+							<button
+								type="button"
+								className="delete-event-modal-btn delete-event-modal-btn--delete"
+								onClick={() => handleDelete(eventToDelete.id)}
+							>
+								Eliminar evento
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
-
-
