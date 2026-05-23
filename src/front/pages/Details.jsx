@@ -4,6 +4,7 @@ import "./Details.css";
 import caja04 from "../assets/img/caja04.png";
 import eventService from "../services/event.service";
 import favoriteService from "../services/favorite.service";
+import reservationService from "../services/reservation.service";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 export const Details = () => {
@@ -16,6 +17,7 @@ export const Details = () => {
   const [showAllModal, setShowAllModal] = useState(false);
   const [event, setEvent] = useState(null);
   const [favoriteRecord, setFavoriteRecord] = useState(null);
+  const [reservationRecord, setReservationRecord] = useState(null);
 
   const { store } = useGlobalReducer();
 
@@ -48,6 +50,10 @@ export const Details = () => {
     const currentFavorite = event.favorites?.find((fav) => fav.user?.id === store.user.id) ?? null;
     setFavoriteRecord(currentFavorite);
     setIsSaved(Boolean(currentFavorite));
+
+    const currentReservation = event.reservations?.find((r) => r.user?.id === store.user.id && r.status === "confirmed") ?? null;
+    setReservationRecord(currentReservation);
+    setIsReserved(Boolean(currentReservation));
   }, [event, store.user]);
 
   // ── LOADING STATE ──
@@ -107,8 +113,38 @@ export const Details = () => {
     }
   };
 
-  const handleReserve = () => setIsReserved(prev => !prev);
+  const handleReserve = async () => {
 
+
+    // si ya hay reserva, eliminarla
+    if (reservationRecord) {
+      const resp = await reservationService.deleteReservation(reservationRecord.id);
+      if (resp) {
+        setReservationRecord(null);
+        setIsReserved(false);
+        setEvent((prevEvent) => ({
+          ...prevEvent,
+          reservations: (prevEvent.reservations || []).filter((r) => r.id !== reservationRecord.id),
+        }));
+      }
+      return;
+    }
+
+    // crear reserva
+    const resp = await reservationService.createReservation(event.id, store.user?.id);
+    if (resp?.reservation) {
+      setReservationRecord(resp.reservation);
+      setIsReserved(true);
+      setEvent((prevEvent) => ({
+        ...prevEvent,
+        reservations: [...(prevEvent.reservations || []), resp.reservation],
+      }));
+    }
+  };
+
+  // calcular plazas disponibles para eventos privados
+  const confirmedCount = (event.reservations || []).filter(r => r.status === "confirmed").length;
+  const remainingSeats = event.max_capacity != null ? Math.max(event.max_capacity - confirmedCount, 0) : null;
   return (
     <div className="event-detail-page page-transition">
       <div className="event-detail-container">
@@ -230,16 +266,22 @@ export const Details = () => {
         {/* ── SIDEBAR ── */}
         <aside className="event-sidebar-content">
 
-          <div className="card-limited">
-            <h3>Aforo limitado</h3>
-            <button
-              className="btn-reserve-ticket"
-              onClick={handleReserve}
-            >
-              <i className={isReserved ? "fa-solid fa-circle-check" : "fa-solid fa-ticket"}></i>
-              <span>{isReserved ? "¡Plaza reservada!" : "Reservar plaza"}</span>
-            </button>
-          </div>
+          {event.event_type === "privado" && (
+            <div className="card-limited">
+              <h3>Aforo limitado</h3>
+              {event.max_capacity != null && (
+                <p style={{ margin: "6px 0 10px" }}>{remainingSeats > 0 ? `${remainingSeats} plazas disponibles` : "Agotado"}</p>
+              )}
+              <button
+                className="btn-reserve-ticket"
+                onClick={handleReserve}
+                disabled={remainingSeats === 0}
+              >
+                <i className={isReserved ? "fa-solid fa-circle-check" : "fa-solid fa-ticket"}></i>
+                <span>{isReserved ? "¡Plaza reservada!" : (remainingSeats === 0 ? "Sin plazas" : "Reservar plaza")}</span>
+              </button>
+            </div>
+          )}
 
           <div className="card-sidebar-white">
             <h3 className="sidebar-title">Información</h3>
