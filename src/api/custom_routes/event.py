@@ -36,7 +36,7 @@ def get_event(event_id):
 def create_event():
     # Verificación de datos necesarios
     body = request.get_json()
-    
+
     seller_id = get_jwt_identity()
 
     required_fields = ['title', 'event_type', 'start_time',
@@ -44,8 +44,6 @@ def create_event():
     for field in required_fields:
         if not body.get(field):
             return jsonify({"success": False, "data": f"Missing field: {field}"}), 403
-
-    
 
      # EVENT TYPE
 
@@ -102,6 +100,8 @@ def create_event():
         end_time=end_time,
         start_date=start_date,
         end_date=end_date,
+        max_capacity=int(body['max_capacity']) if body.get(
+            'max_capacity') else None,
         exact_address=exact_address,
         city=body['city'],
         seller_id=seller_id
@@ -114,7 +114,6 @@ def create_event():
 
 @api.route("/event/<int:event_id>", methods=['PUT'])
 @jwt_required()
-
 def update_event(event_id):
     event = db.session.get(Event, event_id)
     if not event:
@@ -144,7 +143,11 @@ def update_event(event_id):
         event.end_time = datetime.fromisoformat(
             body['end_time'].replace('Z', '+00:00'))
     if 'max_capacity' in body:
-        event.max_capacity = body['max_capacity']
+        try:
+            event.max_capacity = int(
+                body['max_capacity']) if body['max_capacity'] is not None else None
+        except Exception:
+            pass
     if 'exact_address' in body:
         event.exact_address = body['exact_address']
     if 'place' in body:

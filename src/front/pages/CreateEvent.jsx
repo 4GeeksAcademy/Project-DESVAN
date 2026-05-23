@@ -82,6 +82,14 @@ export const CreateEvent = () => {
                 return;
             }
 
+            if (eventData.event_type === "privado") {
+                const cap = Number(eventData.max_capacity);
+                if (!eventData.max_capacity || isNaN(cap) || cap <= 0) {
+                    alert("Debes especificar un aforo máximo válido para eventos privados.");
+                    return;
+                }
+            }
+
             const addressToUse =
                 eventData.exact_address?.trim() ||
                 `${eventData.place.trim()}, ${eventData.city.trim()}`;
@@ -92,6 +100,16 @@ export const CreateEvent = () => {
                 end_time: `${eventData.end_date}T${eventData.end_time}`,
                 exact_address: addressToUse
             };
+
+            // Asegurar tipo numérico y eliminar si no aplica
+            if (payload.max_capacity) {
+                payload.max_capacity = Number(payload.max_capacity);
+                if (isNaN(payload.max_capacity) || payload.max_capacity <= 0) {
+                    delete payload.max_capacity;
+                }
+            } else {
+                delete payload.max_capacity;
+            }
 
             delete payload.seller_id;
 
@@ -194,6 +212,26 @@ export const CreateEvent = () => {
                                     </span>
                                 </div>
                             </div>
+
+                            {/* Aforo máximo para eventos privados */}
+                            {eventData.event_type === "privado" && (
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>
+                                            Aforo máximo <span className="required">*</span>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="max_capacity"
+                                            placeholder="Ej: 50"
+                                            min="1"
+                                            value={eventData.max_capacity}
+                                            onChange={handleChange}
+                                        />
+                                        <span className="input-hint">Número máximo de asistentes</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Ubicación */}
