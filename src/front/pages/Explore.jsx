@@ -287,7 +287,7 @@ export const Explore = () => {
                                             <button className="btn-ver-rastro">Ver rastro</button>
                                         </Link>
 
-                                        <p className="event-card-desc">{event.city}</p>
+                                        <p className="event-card-desc">{event.exact_address}</p>
                                     </div>
                                 </div>
                             );

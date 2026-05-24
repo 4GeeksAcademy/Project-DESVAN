@@ -48,8 +48,7 @@ def create_event():
     except Exception:
         pass
 
-    required_fields = ['title', 'event_type', 'start_time',
-                       'end_time', 'city']
+    required_fields = ['title', 'event_type', 'start_time', 'end_time', 'exact_address']
     for field in required_fields:
         if not body.get(field):
             return jsonify({"success": False, "data": f"Missing field: {field}"}), 403
@@ -78,16 +77,6 @@ def create_event():
             "msg": "Invalid start_time or end_time format"
         }), 400
 
-    exact_address = body.get('exact_address')
-    if not exact_address:
-        place = body.get('place', '').strip()
-        city = body.get('city', '').strip()
-        if place and city:
-            exact_address = f"{place}, {city}"
-
-    if not exact_address:
-        return jsonify({"success": False, "data": "Missing field: exact_address"}), 403
-
     start_date = None
     end_date = None
     if body.get('start_date'):
@@ -111,8 +100,9 @@ def create_event():
         end_date=end_date,
         max_capacity=int(body['max_capacity']) if body.get(
             'max_capacity') else None,
-        exact_address=exact_address,
-        city=body['city'],
+        exact_address=body['exact_address'],
+        latitude=body.get('latitude'),
+        longitude=body.get('longitude'),
         seller_id=seller_id
     )
 
@@ -188,12 +178,10 @@ def update_event(event_id):
                 pass
         if 'exact_address' in body:
             event.exact_address = body['exact_address']
-        if 'place' in body:
-            event.place = body['place']
-        if 'city' in body:
-            event.city = body['city']
-        if 'postal_code' in body:
-            event.postal_code = body['postal_code']
+        if 'latitude' in body:
+            event.latitude = body['latitude']
+        if 'longitude' in body:
+            event.longitude = body['longitude']
 
         db.session.commit()
         return jsonify({"success": True, "data": "All Ok"}), 200

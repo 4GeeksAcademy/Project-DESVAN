@@ -95,7 +95,7 @@ export const Favorites = () => {
 
 								<div className="favorite-meta">
 									<span>
-										<i className="fa-solid fa-location-dot" /> {item.event?.city}
+										<i className="fa-solid fa-location-dot" /> {item.event?.exact_address}
 									</span>
 									<span>
 										<i className="fa-regular fa-calendar" />

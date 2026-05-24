@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
 import mascotOpen from "../assets/img/caja04.png";
 import eventService from "../services/event.service";
@@ -36,10 +36,9 @@ export const CreateEvent = () => {
         end_date: "",
 
         exact_address: "",
-        city: "",
-        place: "",
+        latitude: null,
+        longitude: null,
         max_capacity: "",
-        postal_code: "",
 
         seller_id: "",
     });
@@ -49,6 +48,49 @@ export const CreateEvent = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const location = useLocation();
+    const addressInputRef = useRef(null);
+    const autocompleteRef = useRef(null);
+
+    useEffect(() => {
+        const setupAutocomplete = () => {
+            if (!addressInputRef.current || !window.google || autocompleteRef.current) return;
+            const ac = new window.google.maps.places.Autocomplete(
+                addressInputRef.current,
+                { types: ["geocode", "establishment"], fields: ["formatted_address", "geometry"] }
+            );
+            ac.addListener("place_changed", () => {
+                const place = ac.getPlace();
+                if (!place.geometry) return;
+                setEventData(prev => ({
+                    ...prev,
+                    exact_address: place.formatted_address || "",
+                    latitude: place.geometry.location.lat(),
+                    longitude: place.geometry.location.lng(),
+                }));
+            });
+            autocompleteRef.current = ac;
+        };
+
+        if (window.google) {
+            setupAutocomplete();
+            return;
+        }
+
+        const existingScript = document.getElementById("google-maps-script");
+        if (existingScript) {
+            existingScript.addEventListener("load", setupAutocomplete);
+            return () => existingScript.removeEventListener("load", setupAutocomplete);
+        }
+
+        const script = document.createElement("script");
+        script.id = "google-maps-script";
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
+        script.async = true;
+        script.addEventListener("load", setupAutocomplete);
+        document.head.appendChild(script);
+
+        return () => { autocompleteRef.current = null; };
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
@@ -93,8 +135,8 @@ export const CreateEvent = () => {
     e.preventDefault();
 
     try {
-        if (!eventData.city || !eventData.place) {
-            alert("Debes completar lugar y ciudad para crear el evento.");
+        if (!eventData.exact_address) {
+            alert("Debes seleccionar una dirección del autocompletador.");
             return;
         }
 
@@ -112,15 +154,10 @@ export const CreateEvent = () => {
             }
         }
 
-        const addressToUse =
-            eventData.exact_address?.trim() ||
-            `${eventData.place.trim()}, ${eventData.city.trim()}`;
-
         const payload = {
             ...eventData,
             start_time: `${eventData.start_date}T${eventData.start_time}`,
             end_time: `${eventData.end_date}T${eventData.end_time}`,
-            exact_address: addressToUse
         };
 
         // Asegurar tipo numérico y eliminar si no aplica
@@ -284,59 +321,31 @@ export const CreateEvent = () => {
                         <div className="form-section">
                             <h3 className="section-title">
                                 <span className="section-icon">
-                                    <i class="fa-solid fa-location-dot"></i>
+                                    <i className="fa-solid fa-location-dot"></i>
                                 </span>
                                 Ubicación
                             </h3>
 
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>
-                                        Lugar <span className="required">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="place"
-                                        placeholder="Ej: Plaza de San Fernando"
-                                        value={eventData.place}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Ciudad <span className="required">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        placeholder="Ej: Madrid"
-                                        value={eventData.city}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Dirección exacta</label>
-                                    <input
-                                        type="text"
-                                        name="exact_address"
-                                        placeholder="Ej: Calle de Embajadores, 5"
-                                        value={eventData.exact_address}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Código postal</label>
-                                    <input
-                                        type="text"
-                                        name="postal_code"
-                                        placeholder="Ej: 28012"
-                                        value={eventData.postal_code}
-                                        onChange={handleChange}
-                                    />
-                                </div>
+                            <div className="form-group">
+                                <label>
+                                    Dirección <span className="required">*</span>
+                                </label>
+                                <input
+                                    ref={addressInputRef}
+                                    type="text"
+                                    name="exact_address"
+                                    placeholder="Busca una dirección o lugar..."
+                                    value={eventData.exact_address}
+                                    onChange={(e) => setEventData(prev => ({
+                                        ...prev,
+                                        exact_address: e.target.value,
+                                        latitude: null,
+                                        longitude: null,
+                                    }))}
+                                />
+                                <span className="input-hint">
+                                    Escribe para buscar y selecciona una opción de la lista
+                                </span>
                             </div>
                         </div>
 

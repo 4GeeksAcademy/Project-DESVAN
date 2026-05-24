@@ -66,7 +66,7 @@ export const Details = () => {
   }
 
   // ── MAP URL ──
-  const encodedAddress = encodeURIComponent(event?.exact_address || event?.city || "");
+  const encodedAddress = encodeURIComponent(event?.exact_address || "");
   const mapUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   // ── ACTIONS ──
@@ -163,19 +163,11 @@ export const Details = () => {
           {/* TITLE */}
           <h1 className="event-title">{event.title}</h1>
 
-          {/* SUBTITLE (backend no lo manda → seguro) */}
-          <p className="event-subtitle">{event.city}</p>
-
           {/* META */}
           <div className="event-meta-row">
 
             <div className="event-meta-item">
               <i className="fa-solid fa-location-dot"></i>
-              <span>{event.city}</span>
-            </div>
-
-            <div className="event-meta-item">
-              <i className="fa-solid fa-map-pin"></i>
               <span>{event.exact_address}</span>
             </div>
 
@@ -315,7 +307,6 @@ export const Details = () => {
               <div className="sidebar-info-item">
                 <i className="fa-solid fa-location-dot"></i>
                 <div>
-                  <strong>{event.city}</strong>
                   <span>{event.exact_address}</span>
                 </div>
               </div>
