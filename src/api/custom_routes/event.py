@@ -48,8 +48,8 @@ def create_event():
     except Exception:
         pass
 
-    required_fields = ['title', 'event_type', 'start_time',
-                       'end_time', 'city']
+    required_fields = ['title', 'event_type',
+                       'start_time', 'end_time', 'exact_address']
     for field in required_fields:
         if not body.get(field):
             return jsonify({"success": False, "data": f"Missing field: {field}"}), 403
@@ -78,16 +78,6 @@ def create_event():
             "msg": "Invalid start_time or end_time format"
         }), 400
 
-    exact_address = body.get('exact_address')
-    if not exact_address:
-        place = body.get('place', '').strip()
-        city = body.get('city', '').strip()
-        if place and city:
-            exact_address = f"{place}, {city}"
-
-    if not exact_address:
-        return jsonify({"success": False, "data": "Missing field: exact_address"}), 403
-
     start_date = None
     end_date = None
     if body.get('start_date'):
@@ -111,8 +101,9 @@ def create_event():
         end_date=end_date,
         max_capacity=int(body['max_capacity']) if body.get(
             'max_capacity') else None,
-        exact_address=exact_address,
-        city=body['city'],
+        exact_address=body['exact_address'],
+        latitude=body.get('latitude'),
+        longitude=body.get('longitude'),
         seller_id=seller_id
     )
 
@@ -188,12 +179,10 @@ def update_event(event_id):
                 pass
         if 'exact_address' in body:
             event.exact_address = body['exact_address']
-        if 'place' in body:
-            event.place = body['place']
-        if 'city' in body:
-            event.city = body['city']
-        if 'postal_code' in body:
-            event.postal_code = body['postal_code']
+        if 'latitude' in body:
+            event.latitude = body['latitude']
+        if 'longitude' in body:
+            event.longitude = body['longitude']
 
         db.session.commit()
         return jsonify({"success": True, "data": "All Ok"}), 200
@@ -219,3 +208,66 @@ def delete_event(event_id):
     db.session.delete(event)
     db.session.commit()
     return jsonify({"success": True, "data": "Event deleted successfully"}), 200
+
+
+@api.route("/event/nearby", methods=['GET'])
+@jwt_required()
+def get_nearby_events():
+    """
+    Obtiene eventos cercanos a una ubicación específica.
+    Parámetros query:
+    - latitude: latitud (requerido)
+    - longitude: longitud (requerido)
+    - distance: distancia en km (opcional, default 10)
+    """
+    try:
+        latitude = request.args.get('latitude', type=float)
+        longitude = request.args.get('longitude', type=float)
+        distance = request.args.get('distance', default=10, type=float)
+
+        if latitude is None or longitude is None:
+            return jsonify({
+                "success": False,
+                "msg": "latitude and longitude are required"
+            }), 400
+
+        # Obtener todos los eventos
+        all_events = db.session.execute(db.select(Event)).scalars().all()
+
+        # Función para calcular distancia Haversine
+        def haversine_distance(lat1, lon1, lat2, lon2):
+            from math import radians, cos, sin, asin, sqrt
+
+            lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+            c = 2 * asin(sqrt(a))
+            r = 6371  # Radio de la tierra en km
+
+            return c * r
+
+        # Filtrar eventos cercanos
+        nearby_events = []
+        for event in all_events:
+            if event.latitude and event.longitude:
+                dist = haversine_distance(
+                    latitude, longitude, event.latitude, event.longitude)
+                if dist <= distance:
+                    nearby_events.append({
+                        "event": event.serialize(),
+                        "distance_km": round(dist, 2)
+                    })
+
+        # Ordenar por distancia
+        nearby_events.sort(key=lambda x: x['distance_km'])
+
+        return jsonify({
+            "success": True,
+            "data": nearby_events,
+            "count": len(nearby_events)
+        }), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "msg": str(e)}), 500

@@ -95,7 +95,6 @@ class Favorite (db.Model):
                 "title": self.event.title,
                 "description": self.event.description,
                 "image_url": self.event.image_url,
-                "city": self.event.city,
                 "exact_address": self.event.exact_address,
                 "event_type": self.event.event_type.value if self.event.event_type else None,
                 "start_time": self.event.start_time.isoformat() if self.event.start_time else None,
@@ -131,37 +130,13 @@ class Event (db.Model):  # ESTA TABLA DEBE IR ARRIBA?
     max_capacity: Mapped[int] = mapped_column(Integer, nullable= True)
 
 
-    #columnas con respecto a ubicación
-        
-    exact_address: Mapped[str] = mapped_column(String(255), nullable= False)
-    place: Mapped[str] = mapped_column(String(255), nullable=True)       # Punto 10: nombre del lugar
-    city: Mapped[str] = mapped_column(String(100), nullable=False)       # Punto 10: ciudad
-    postal_code: Mapped[str] = mapped_column(String(10), nullable=True)  # Punto 10: código postal
-
-
-    #clave foránea
-    seller_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-
-
-    #1-M
-    seller: Mapped["User"] = relationship(back_populates = "events")
-
-
-    #relación
-    reservations: Mapped[List["Reservation"]]= relationship(back_populates="event", cascade= "all, delete-orphan")
-
-
+    # ubicación
     exact_address: Mapped[str] = mapped_column(String(255), nullable=False)
-    place: Mapped[str] = mapped_column(
-        String(255), nullable=True)       # Punto 10: nombre del lugar
-    city: Mapped[str] = mapped_column(
-        String(100), nullable=False)       # Punto 10: ciudad
-    postal_code: Mapped[str] = mapped_column(
-        String(10), nullable=True)  # Punto 10: código postal
+    latitude: Mapped[float] = mapped_column(Float, nullable=True)
+    longitude: Mapped[float] = mapped_column(Float, nullable=True)
 
     # clave foránea
-    seller_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False)
+    seller_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     # 1-M
     seller: Mapped["User"] = relationship(back_populates="events")
@@ -208,10 +183,9 @@ class Event (db.Model):  # ESTA TABLA DEBE IR ARRIBA?
             "title": self.title,
             "description": self.description,
             "event_type": self.event_type.value, 
-            "exact_address":self.exact_address,
-            "place": self.place,
-            "city": self.city,
-            "postal_code": self.postal_code,
+            "exact_address": self.exact_address,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
             "start_time": self.start_time.isoformat() if self.start_time else None,
             "end_time": self.end_time.isoformat() if self.end_time else None,
             "start_date": self.start_date.isoformat() if self.start_date else None,

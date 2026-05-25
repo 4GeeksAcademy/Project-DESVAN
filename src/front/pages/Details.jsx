@@ -6,6 +6,7 @@ import eventService from "../services/event.service";
 import favoriteService from "../services/favorite.service";
 import reservationService from "../services/reservation.service";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { Map } from "../components/Map";
 
 export const Details = () => {
   const { eventId } = useParams();
@@ -64,10 +65,6 @@ export const Details = () => {
       </div>
     );
   }
-
-  // ── MAP URL ──
-  const encodedAddress = encodeURIComponent(event?.exact_address || event?.city || "");
-  const mapUrl = `https://maps.google.com/maps?q=${encodedAddress}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   // ── ACTIONS ──
   const handleShare = () => {
@@ -163,19 +160,11 @@ export const Details = () => {
           {/* TITLE */}
           <h1 className="event-title">{event.title}</h1>
 
-          {/* SUBTITLE (backend no lo manda → seguro) */}
-          <p className="event-subtitle">{event.city}</p>
-
           {/* META */}
           <div className="event-meta-row">
 
             <div className="event-meta-item">
               <i className="fa-solid fa-location-dot"></i>
-              <span>{event.city}</span>
-            </div>
-
-            <div className="event-meta-item">
-              <i className="fa-solid fa-map-pin"></i>
               <span>{event.exact_address}</span>
             </div>
 
@@ -246,19 +235,11 @@ export const Details = () => {
               {event.exact_address}
             </p>
 
-            <div className="map-container">
-              <iframe
-                title="map"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                src={mapUrl}
-                style={{
-                  border: "none",
-                  filter: "grayscale(0.2)"
-                }}
-              />
-            </div>
+            <Map
+              address={event.exact_address}
+              latitude={event.latitude}
+              longitude={event.longitude}
+            />
           </section>
 
         </main>
@@ -315,7 +296,6 @@ export const Details = () => {
               <div className="sidebar-info-item">
                 <i className="fa-solid fa-location-dot"></i>
                 <div>
-                  <strong>{event.city}</strong>
                   <span>{event.exact_address}</span>
                 </div>
               </div>
