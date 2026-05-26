@@ -20,6 +20,8 @@ export const Reviews = () => {
   const [editComment, setEditComment] = useState("");
   const [actionError, setActionError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { store, dispatch } = useGlobalReducer();
   const navigate = useNavigate();
 
@@ -135,36 +137,45 @@ export const Reviews = () => {
     }
   };
 
-  const handleDeleteReview = async (reviewId) => {
-    const confirmDelete = window.confirm("¿Eliminar esta valoración?");
-    if (!confirmDelete) return;
+  const handleDeleteReview = (reviewId) => {
+    setReviewToDelete(reviewId);
+  };
 
-    setIsSaving(true);
+  const handleConfirmDelete = async () => {
+    if (!reviewToDelete) return;
+
+    setIsDeleting(true);
     setActionError(null);
 
     try {
-      const resp = await reviewService.deleteReview(reviewId);
+      const resp = await reviewService.deleteReview(reviewToDelete);
       if (!resp) {
         throw new Error("No se pudo eliminar la valoración");
       }
 
-      setWrittenReviews((prevWritten) => prevWritten.filter((review) => review.id !== reviewId));
+      setWrittenReviews((prevWritten) => prevWritten.filter((review) => review.id !== reviewToDelete));
       setUser((prevUser) => {
         if (!prevUser) return prevUser;
-        const my_written_reviews = prevUser.my_written_reviews?.filter((review) => review.id !== reviewId);
+        const my_written_reviews = prevUser.my_written_reviews?.filter((review) => review.id !== reviewToDelete);
         const updatedUser = { ...prevUser, my_written_reviews };
         dispatch({ type: "auth", payload: { user: updatedUser } });
         return updatedUser;
       });
-      if (selectedReview?.id === reviewId) {
+      if (selectedReview?.id === reviewToDelete) {
         setSelectedReview(null);
       }
+      setReviewToDelete(null);
     } catch (err) {
       console.log(err);
       setActionError(err?.message || "Error eliminando valoracion");
     } finally {
-      setIsSaving(false);
+      setIsDeleting(false);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setReviewToDelete(null);
+    setActionError(null);
   };
 
   const renderRatingStars = (rating) => {
@@ -197,7 +208,7 @@ export const Reviews = () => {
           <div>
             <span className="review-card-badge">{type === "received" ? "Recibida" : "Escrita"}</span>
             <p className="review-card-meta">
-              {type === "received" ? `De ${review.reviewer?.email ?? "usuario"}` : `Sobre ${review.reviewed?.email ?? "usuario"}`}
+              {type === "received" ? `De @${review.reviewer?.username ?? "usuario"}` : `Sobre ${review.reviewed?.email ?? "usuario"}`}
             </p>
           </div>
           <div className="review-card-rating">
@@ -363,8 +374,49 @@ export const Reviews = () => {
               </div>
             </div>
           )}
+
+          {reviewToDelete && (
+            <div className="modal-backdrop" onClick={handleCancelDelete}>
+              <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
+                <div className="review-modal-header">
+                  <h3>Eliminar valoración</h3>
+                  <button
+                    type="button"
+                    className="modal-close-btn"
+                    onClick={handleCancelDelete}
+                    aria-label="Cerrar confirmación de eliminación"
+                  >
+                    <i className="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <div className="review-delete-form">
+                  <p className="delete-confirmation-text">¿Estás seguro de que deseas eliminar esta valoración? Esta acción no se puede deshacer.</p>
+                  {actionError && <p className="form-error">{actionError}</p>}
+                  <div className="review-modal-actions">
+                    <button
+                      type="button"
+                      className="review-btn-cancel"
+                      onClick={handleCancelDelete}
+                      disabled={isDeleting}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="button"
+                      className="review-btn-delete"
+                      onClick={handleConfirmDelete}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? "Eliminando..." : "Eliminar"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
   );
 };
+
