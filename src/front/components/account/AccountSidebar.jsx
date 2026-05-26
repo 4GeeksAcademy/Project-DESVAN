@@ -72,23 +72,26 @@ export const AccountSidebar = () => {
 		<div className="account-sidebar-wrap">
 		<aside className="account-sidebar">
 			<div className="account-sidebar-profile">
-				{user?.profile_picture_url ? (
+				{/* TODO: Sustituye por tu foto de perfil del sidebar
+				    <img src={rutaATuImagen} alt="Archibald Vance" className="account-sidebar-avatar" />
+				*/}
+				{user && (user.profile_picture_url || user.profile_picture) ? (
 					<img
-						src={user.profile_picture_url}
-						alt={user.username || "Foto de perfil"}
+						src={user.profile_picture_url || user.profile_picture}
+						alt={user.username || "avatar"}
 						className="account-sidebar-avatar"
 					/>
 				) : (
 					<div className="account-sidebar-avatar account-img-placeholder" aria-hidden="true" />
 				)}
 
-				<div className="account-sidebar-user">
-					<strong>{user?.username || "Coleccionista"}</strong>
-					<span>{user?.email || "Cuenta activa"}</span>
-					<span className="account-sidebar-since">
-						desde {user?.created_at ? new Date(user.created_at).toLocaleDateString("es-ES", { month: "long", year: "numeric" }) : "2023"}
-					</span>
-				</div>
+					<div className="account-sidebar-user">
+						<strong>{user ? `${(user.profile && user.profile.firstname) || user.username} ${
+							(user.profile && user.profile.lastname) || ""
+						}`.trim() : "Usuario"}</strong>
+						<span>{user ? `@${user.username}` : "@usuario"}</span>
+						<span className="account-sidebar-since">{getJoinText()}</span>
+					</div>
 			</div>
 
 			<nav className="account-sidebar-nav">
