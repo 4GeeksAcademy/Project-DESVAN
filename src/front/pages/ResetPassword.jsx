@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import authService from "../services/auth.service";
 import "./Login.css";
@@ -12,6 +12,19 @@ export const ResetPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const alertTimeoutRef = useRef(null);
+
+  const showErrorAlert = (msg) => {
+    setError(msg);
+    if (alertTimeoutRef.current) {
+      clearTimeout(alertTimeoutRef.current);
+    }
+    alertTimeoutRef.current = setTimeout(() => {
+      setError("");
+    }, 8000);
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -25,15 +38,23 @@ export const ResetPassword = () => {
     setMessage("");
 
     if (!token) {
-      setError("Falta el token de recuperación.");
+      showErrorAlert("Falta el token de recuperación.");
+      return;
+    }
+    if (!password) {
+      showErrorAlert("Por favor, ingresa una nueva contraseña.");
+      return;
+    }
+    if (!confirmPassword) {
+      showErrorAlert("Por favor, confirma tu nueva contraseña.");
       return;
     }
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+      showErrorAlert("La contraseña debe tener al menos 6 caracteres.");
       return;
     }
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden.");
+      showErrorAlert("Las contraseñas no coinciden.");
       return;
     }
 
@@ -43,7 +64,7 @@ export const ResetPassword = () => {
       setMessage(data?.msg || "Contraseña actualizada correctamente.");
       setTimeout(() => navigate("/login"), 1800);
     } catch (err) {
-      setError(err.message || "Error actualizando contraseña.");
+      showErrorAlert(err.message || "Error actualizando contraseña.");
     } finally {
       setLoading(false);
     }
@@ -61,8 +82,8 @@ export const ResetPassword = () => {
             <p className="auth-card-subtitle">Crea una nueva contraseña para tu cuenta.</p>
           </div>
 
-          {message && <div className="auth-alert alert-success"><span>{message}</span></div>}
-          {error && <div className="auth-alert alert-danger"><span>{error}</span></div>}
+          {message && <div className="auth-alert alert-success"><i className="fa-solid fa-circle-check"></i><span>{message}</span></div>}
+          {error && <div className="auth-alert alert-danger"><i className="fa-solid fa-circle-exclamation"></i><span>{error}</span></div>}
 
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
@@ -70,14 +91,21 @@ export const ResetPassword = () => {
               <div className="input-wrapper">
                 <i className="fa-solid fa-lock input-icon"></i>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
-                  required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Toggle password visibility"
+                >
+                  <i className={showPassword ? "fa-regular fa-eye-slash" : "fa-regular fa-eye"}></i>
+                </button>
               </div>
             </div>
 
@@ -86,14 +114,21 @@ export const ResetPassword = () => {
               <div className="input-wrapper">
                 <i className="fa-solid fa-lock input-icon"></i>
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   name="confirmPassword"
-                  required
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label="Toggle confirm password visibility"
+                >
+                  <i className={showConfirmPassword ? "fa-regular fa-eye-slash" : "fa-regular fa-eye"}></i>
+                </button>
               </div>
             </div>
 

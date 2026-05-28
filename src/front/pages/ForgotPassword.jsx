@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import authService from "../services/auth.service";
 import "./Login.css";
@@ -8,18 +8,35 @@ export const ForgotPassword = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const alertTimeoutRef = useRef(null);
+
+  const showErrorAlert = (msg) => {
+    setError(msg);
+    if (alertTimeoutRef.current) {
+      clearTimeout(alertTimeoutRef.current);
+    }
+    alertTimeoutRef.current = setTimeout(() => {
+      setError("");
+    }, 8000);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
+
+    if (!email.trim()) {
+      showErrorAlert("Por favor, ingresa un correo electrónico.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const data = await authService.forgotPassword(email);
       setMessage(data?.msg || "Si el email existe, recibirás un enlace para restablecer tu contraseña.");
     } catch (err) {
-      setError(err.message || "Error enviando el correo de recuperación.");
+      showErrorAlert(err.message || "Error enviando el correo de recuperación.");
     } finally {
       setLoading(false);
     }
@@ -37,8 +54,8 @@ export const ForgotPassword = () => {
             <p className="auth-card-subtitle">Ingresa tu email para recibir el enlace de restablecimiento.</p>
           </div>
 
-          {message && <div className="auth-alert alert-success"><span>{message}</span></div>}
-          {error && <div className="auth-alert alert-danger"><span>{error}</span></div>}
+          {message && <div className="auth-alert alert-success"><i className="fa-solid fa-circle-check"></i><span>{message}</span></div>}
+          {error && <div className="auth-alert alert-danger"><i className="fa-solid fa-circle-exclamation"></i><span>{error}</span></div>}
 
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
@@ -49,7 +66,6 @@ export const ForgotPassword = () => {
                   type="email"
                   id="email"
                   name="email"
-                  required
                   placeholder="correo@ejemplo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
