@@ -26,10 +26,6 @@ export const CreateEvent = () => {
     const { store, dispatch, showErrorAlert } = useGlobalReducer();
     const navigate = useNavigate();
 
-    if (!localStorage.getItem('token')) {
-        return <Navigate to="/login" replace />;
-    }
-
     const [eventData, setEventData] = useState({
         title: "",
         description: "",
@@ -61,11 +57,10 @@ export const CreateEvent = () => {
     
 
     useEffect(() => {
-        authService.getMe().then((resp) => {
-            const user = resp?.data ?? resp;
-            setIsVerified(user?.is_verified ?? false);
-        }).catch(() => setIsVerified(false));
-    }, []);
+        if (store.user) {
+            setIsVerified(store.user?.is_verified ?? false);
+        }
+    }, [store.user]);
 
     useEffect(() => {
         const setupAutocomplete = () => {

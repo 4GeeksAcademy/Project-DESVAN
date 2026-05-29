@@ -238,21 +238,6 @@ export const Explore = () => {
 
     //Para que carguen los eventos
     useEffect(() => {
-        if (localStorage.getItem("token") && !store.user) {
-            authService.getMe()
-                .then((data) => {
-                    if (data?.data) {
-                        dispatch({
-                            type: "auth",
-                            payload: { user: data.data },
-                        });
-                    }
-                })
-                .catch(() => {
-                    localStorage.removeItem("token");
-                });
-        }
-
         const loader = localStorage.getItem("token") ? eventService.getEvents() : eventService.getEventsPublic();
 
         loader

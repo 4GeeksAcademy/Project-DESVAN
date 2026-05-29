@@ -22,6 +22,8 @@ import { MyEvents } from "./pages/account/MyEvents";
 import { Reviews } from "./pages/account/Reviews";
 import { Details } from "./pages/Details"
 
+import { ProtectedRoute } from "./components/ProtectedRoute";
+
 export const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -33,17 +35,24 @@ export const router = createBrowserRouter(
         <Route path="/single/:theId" element={<Single />} />  {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />
         <Route path="/explorar" element={<Explore />} />
-        <Route path="/crear-evento" element={<CreateEvent />} />
+        
+        {/* Rutas que comparten Layout y requieren autenticación */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/crear-evento" element={<CreateEvent />} />
+        </Route>
+        
         <Route path="/detalles/:eventId" element={<Details />} />
       </Route>
 
-      {/* Área de cuenta — navbar + sidebar, sin footer */}
-      <Route element={<AccountLayout />}>
-        <Route path="/perfil" element={<Profile />} />
-        <Route path="/favoritos" element={<Favorites />} />
-        <Route path="/mis-reservas" element={<Reservations />} />
-        <Route path="/mis-eventos" element={<MyEvents />} />
-        <Route path="/mis-valoraciones" element={<Reviews />} />
+      {/* Área de cuenta — navbar + sidebar, sin footer. Protegida. */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AccountLayout />}>
+          <Route path="/perfil" element={<Profile />} />
+          <Route path="/favoritos" element={<Favorites />} />
+          <Route path="/mis-reservas" element={<Reservations />} />
+          <Route path="/mis-eventos" element={<MyEvents />} />
+          <Route path="/mis-valoraciones" element={<Reviews />} />
+        </Route>
       </Route>
 
       {/* Login / Registration Page separado sin navbar ni footer */}

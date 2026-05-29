@@ -5,6 +5,7 @@ export const initialStore=()=>{
     name: null,
     error: null,
     loading: false,
+    userLoading: localStorage.getItem('token') ? true : false,
   }
 }
 
@@ -15,7 +16,8 @@ export default function storeReducer(store, action = {}) {
         ...store, 
         auth:true, 
         user:action.payload.user,
-        name:action.payload.user?.username || action.payload.user?.name || null
+        name:action.payload.user?.username || action.payload.user?.name || null,
+        userLoading: false
       }
 
     case 'logout':
@@ -24,7 +26,8 @@ export default function storeReducer(store, action = {}) {
         auth:false, 
         user:null,
         name:null,
-        token:null
+        token:null,
+        userLoading: false
       }
     
     case 'setError':
@@ -37,6 +40,11 @@ export default function storeReducer(store, action = {}) {
       return{
         ...store,
         loading:action.payload
+      } 
+    case 'setUserLoading':
+      return{
+        ...store,
+        userLoading:action.payload
       } 
      
    

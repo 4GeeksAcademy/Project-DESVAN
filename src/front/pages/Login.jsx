@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import authService from "../services/auth.service";
@@ -118,18 +118,10 @@ export const Login = () => {
 
 
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      if (!store.user) {
-        authService.getMe().then(data => dispatch({
-          type: 'auth',
-          payload: {
-            user: data.data
-          }
-        })).catch(err => console.log(err));
-      }
+    if (localStorage.getItem('token') && store.user) {
       navigate('/explorar');
     }
-  }, [store.auth, navigate]);
+  }, [store.user, navigate]);
 
   // Toggle state between Login and Register
   const handleToggleMode = () => {

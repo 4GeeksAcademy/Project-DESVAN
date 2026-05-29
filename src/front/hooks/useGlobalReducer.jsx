@@ -1,17 +1,34 @@
 // Import necessary hooks and functions from React.
-import { useContext, useReducer, createContext } from "react";
-import storeReducer, { initialStore } from "../store"  // Import the reducer and the initial state.
+import { useContext, useReducer, createContext, useEffect } from "react";
+import storeReducer, { initialStore } from "../store"
+import authService from "../services/auth.service";
 
-// Create a context to hold the global state of the application
-// We will call this global state the "store" to avoid confusion while using local states
 const StoreContext = createContext()
 
-// Define a provider component that encapsulates the store and warps it in a context provider to 
-// broadcast the information throught all the app pages and components.
 export function StoreProvider({ children }) {
-    // Initialize reducer with the initial state.
     const [store, dispatch] = useReducer(storeReducer, initialStore())
-    // Provide the store and dispatch method to all child components.
+
+    useEffect(() => {
+        if (localStorage.getItem('token') && !store.user) {
+            authService.getMe()
+                .then(data => {
+                    const currentUser = data?.data ?? data;
+                    if (currentUser) {
+                        dispatch({ type: 'auth', payload: { user: currentUser } });
+                    } else {
+                        dispatch({ type: 'setUserLoading', payload: false });
+                    }
+                })
+                .catch(err => {
+                    console.error("Global auth fetch error:", err);
+                    localStorage.removeItem('token');
+                    dispatch({ type: 'logout' });
+                });
+        } else if (!localStorage.getItem('token')) {
+            dispatch({ type: 'setUserLoading', payload: false });
+        }
+    }, [])
+
     return <StoreContext.Provider value={{ store, dispatch }}>
         {children}
     </StoreContext.Provider>

@@ -18,7 +18,6 @@ const STATUS_BY_TAB = {
 export const Reservations = () => {
 	const [activeTab, setActiveTab] = useState("Próximas");
 	const [reservations, setReservations] = useState([]);
-	const [loading, setLoading] = useState(true);
 	const { store, dispatch } = useGlobalReducer();
 	const navigate = useNavigate();
 
@@ -29,38 +28,26 @@ export const Reservations = () => {
 			return;
 		}
 
-		const loadUserAndReservations = async () => {
-			let user = store.user;
-			if (!user) {
-				try {
-					const profile = await authService.getMe();
-					user = profile?.data;
-					if (user) {
-						dispatch({ type: "auth", payload: { user } });
-					}
-				} catch (error) {
-					navigate("/login");
-					return;
-				}
-			}
+		if (store.userLoading) return;
 
-			if (!user) {
-				navigate("/login");
-				return;
-			}
+		if (!store.user) {
+			navigate("/login");
+			return;
+		}
 
+		const fetchReservations = async () => {
 			try {
-				const data = await reservationService.getReservationsByUser(user.id);
+				const data = await reservationService.getReservationsByUser(store.user.id);
 				setReservations(data || []);
 			} catch (error) {
 				console.log(error);
 			} finally {
-				setLoading(false);
+				dispatch({ type: 'setLoading', payload: false });
 			}
 		};
 
-		loadUserAndReservations();
-	}, [store.user, dispatch, navigate]);
+		fetchReservations();
+	}, [store.user, store.userLoading, dispatch, navigate]);
 
 	const handleDelete = async (reservationId) => {
 		const resp = await reservationService.deleteReservation(reservationId);
@@ -105,10 +92,10 @@ export const Reservations = () => {
 			<div className="reservations-layout">
 				<div className="reservations-main">
 					<div className="reservations-list">
-						{loading ? (
-							<div className="favorite-empty-state">
-								<p>Cargando tus reservas…</p>
-							</div>
+						{store.loading ? (
+						<div className="favorite-empty-state">
+							<p>Cargando tus reservas…</p>
+						</div>
 						) : reservationsToShow.length === 0 ? (
 							<div className="favorite-empty-state">
 								<p>No hay reservas en esta pestaña.</p>
