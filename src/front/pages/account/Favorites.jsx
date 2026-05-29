@@ -13,42 +13,14 @@ export const Favorites = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const token = localStorage.getItem("token");
-		if (!token) {
-			navigate("/login");
-			return;
-		}
+		favoriteService
+			.getFavoritesByUser(store.user.id)
+			.then((data) => {
+				setFavorites(data || []);
+			})
+			.catch((err) => console.log(err));
 
-		const loadUserAndFavorites = async () => {
-			let user = store.user;
-			if (!user) {
-				try {
-					const profile = await authService.getMe();
-					user = profile?.data;
-					if (user) {
-						dispatch({ type: "auth", payload: { user } });
-					}
-				} catch (error) {
-					navigate("/login");
-					return;
-				}
-			}
-
-			if (!user) {
-				navigate("/login");
-				return;
-			}
-
-			favoriteService
-				.getFavoritesByUser(user.id)
-				.then((data) => {
-					setFavorites(data || []);
-				})
-				.catch((err) => console.log(err));
-		};
-
-		loadUserAndFavorites();
-	}, [store.user, dispatch, navigate]);
+	}, [store.user, navigate]);
 
 	const handleRemove = async (favoriteId) => {
 		const resp = await favoriteService.deleteFavorite(favoriteId);

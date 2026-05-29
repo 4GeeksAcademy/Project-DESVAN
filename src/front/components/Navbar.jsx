@@ -14,17 +14,6 @@ export const Navbar = () => {
 
     const { store, dispatch } = useGlobalReducer();
 
-    useEffect(() => {
-        if (localStorage.getItem('token') && !store.user) {
-            authService.getMe().then(data => dispatch({
-                type: 'auth',
-                payload: {
-                    user: data.data
-                }
-            }))
-        }
-    }, [store.auth])
-
 	console.log(store.user)
 
 	return (

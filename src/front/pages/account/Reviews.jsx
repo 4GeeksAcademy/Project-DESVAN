@@ -12,8 +12,6 @@ export const Reviews = () => {
   const [user, setUser] = useState(null);
   const [writtenReviews, setWrittenReviews] = useState([]);
   const [receivedReviews, setReceivedReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [selectedReview, setSelectedReview] = useState(null);
   const [editingReview, setEditingReview] = useState(null);
@@ -23,55 +21,28 @@ export const Reviews = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { store, dispatch } = useGlobalReducer();
+  const { store, dispatch, showErrorAlert } = useGlobalReducer();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    const loadUser = async () => {
-      let currentUser = store.user;
-      if (!currentUser) {
-        try {
-          const profile = await authService.getMe();
-          currentUser = profile?.data ?? profile;
-          if (currentUser) {
-            dispatch({ type: "auth", payload: { user: currentUser } });
-          }
-        } catch (err) {
-          console.log(err);
-          setError("Error al cargar usuario");
-        }
-      }
-
-      if (!currentUser) {
-        navigate("/login");
-        return;
-      }
-
-      setUser(currentUser);
-
+    const fetchReviews = async () => {
       try {
         const [written, received] = await Promise.all([
-          reviewService.getWrittenReviewsByUser(currentUser.id),
-          reviewService.getReceivedReviewsByUser(currentUser.id),
+          reviewService.getWrittenReviewsByUser(store.user.id),
+          reviewService.getReceivedReviewsByUser(store.user.id),
         ]);
         setWrittenReviews(written || []);
         setReceivedReviews(received || []);
       } catch (err) {
         console.log(err);
-        setError("Error al cargar valoraciones");
+        showErrorAlert("Error al cargar valoraciones");
       } finally {
-        setLoading(false);
+        dispatch({ type: 'setLoading', payload: false });
       }
     };
 
-    loadUser();
-  }, [store.user, dispatch, navigate]);
+    fetchReviews();
+  }, [store.user, store.userLoading, dispatch, navigate]);
 
   const handleCloseEditReview = () => {
     setEditingReview(null);
@@ -261,13 +232,13 @@ export const Reviews = () => {
         subtitle="Tus reviews recibidas y escritas en un solo lugar."
       />
 
-      {loading ? (
+      {store.loading ? (
         <div className="favorite-empty-state">
           <p>Cargando tus valoraciones…</p>
         </div>
-      ) : error ? (
+      ) : store.error ? (
         <div className="favorite-empty-state">
-          <p>{error}</p>
+          <p>{store.error}</p>
         </div>
       ) : (
         <>

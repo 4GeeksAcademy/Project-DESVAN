@@ -59,7 +59,7 @@ export const Profile = () => {
 	const [successMsg, setSuccessMsg] = useState("");
 	const [showPrefixDropdown, setShowPrefixDropdown] = useState(false);
 	const navigate = useNavigate();
-	const { dispatch } = useGlobalReducer();
+	const { store,dispatch } = useGlobalReducer();
 	const addressInputRef = useRef(null);
 	const autocompleteRef = useRef(null);
 	const prefixDropdownRef = useRef(null);
@@ -111,25 +111,19 @@ export const Profile = () => {
 	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect(() => {
-		const load = async () => {
-			const resp = await authService.getMe();
-			const user = resp?.data ?? resp;
-			if (user) {
-				setData(user);
-				setEmail(user.email || "");
-				const { prefix, number } = splitPhone((user.profile && user.profile.phone) || "");
-				setPhonePrefix(prefix);
-				setPhoneNumber(number);
-				setAddress((user.profile && user.profile.address) || "");
-				setFirstname((user.profile && user.profile.firstname) || "");
-				setLastname((user.profile && user.profile.lastname) || "");
-				if (user.profile_picture_url) {
-					setProfilePicturePreview(user.profile_picture_url);
-				}
-			}
-		};
-		load();
-	}, []);
+		const user = store.user;
+		setData(user);
+		setEmail(user.email || "");
+		const { prefix, number } = splitPhone((user.profile && user.profile.phone) || "");
+		setPhonePrefix(prefix);
+		setPhoneNumber(number);
+		setAddress((user.profile && user.profile.address) || "");
+		setFirstname((user.profile && user.profile.firstname) || "");
+		setLastname((user.profile && user.profile.lastname) || "");
+		if (user.profile_picture_url) {
+			setProfilePicturePreview(user.profile_picture_url);
+		}
+	}, [store.user]);
 
 	const onSave = async () => {
 		let profile_picture_url = null;

@@ -27,34 +27,31 @@ const STATUS_VARIANT_MAP = {
 export const MyEvents = () => {
 	const [activeTab, setActiveTab] = useState("TODOS");
 	const [userEvents, setUserEvents] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
 	const [eventToDelete, setEventToDelete] = useState(null);
-	const { store } = useGlobalReducer();
+	const { store, dispatch, showErrorAlert } = useGlobalReducer();
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetchUserEvents = async () => {
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			if (store.userLoading) return;
+
+			let currentUser = store.user;
+			if (!currentUser) {
+				showErrorAlert("Usuario no autenticado");
+				return;
+			}
+
 			try {
-				setLoading(true);
-				let currentUser = store.user;
-
-				// Si no hay usuario en store pero sí hay token, obtener los datos del usuario
-				if (!currentUser && localStorage.getItem("token")) {
-					const userData = await authService.getMe();
-					currentUser = userData;
-				}
-
-				if (!currentUser) {
-					setError("Usuario no autenticado");
-					return;
-				}
+				dispatch({ type: 'setLoading', payload: true });
 
 				// Obtener eventos de la API
 				const response = await eventService.getEvents();
 
 				if (!response || !response.data || !Array.isArray(response.data)) {
-					setError("No se pudieron cargar los eventos");
+					showErrorAlert("No se pudieron cargar los eventos");
 					setUserEvents([]);
 					return;
 				}
@@ -66,18 +63,18 @@ export const MyEvents = () => {
 					(event) => event.seller && event.seller.id === currentUser.id
 				);
 				setUserEvents(filtered);
-				setError(null);
+				showErrorAlert(null);
 			} catch (err) {
 				console.error("Error fetching user events:", err);
-				setError("Error al cargar tus eventos");
+				showErrorAlert("Error al cargar tus eventos");
 				setUserEvents([]);
 			} finally {
-				setLoading(false);
+				dispatch({ type: 'setLoading', payload: false });
 			}
 		};
 
 		fetchUserEvents();
-	}, [store.user]);
+	}, [store.user, store.userLoading, dispatch]);
 
 	// Función para filtrar eventos por tab
 	const getFilteredEvents = () => {
@@ -120,7 +117,7 @@ export const MyEvents = () => {
 	// Eliminar: llamar al servicio y actualizar UI
 	const handleDelete = async (eventId) => {
 		try {
-			setLoading(true);
+			dispatch({ type: 'setLoading', payload: true });
 			const resp = await eventService.deleteEvent(eventId);
 			if (resp === false) throw new Error("Error al eliminar");
 			setUserEvents((prev) => prev.filter((e) => e.id !== eventId));
@@ -129,7 +126,7 @@ export const MyEvents = () => {
 			console.error(err);
 			alert("No se pudo eliminar el evento");
 		} finally {
-			setLoading(false);
+			dispatch({ type: 'setLoading', payload: false });
 		}
 	};
 
@@ -156,12 +153,12 @@ export const MyEvents = () => {
 			</div>
 
 			<div className="events-table-card">
-				{loading && <p>Cargando tus eventos...</p>}
-				{error && <p style={{ color: "red" }}>{error}</p>}
-				{!loading && filteredEvents.length === 0 && (
+				{store.loading && <p>Cargando tus eventos...</p>}
+				{store.error && <p style={{ color: "red" }}>{store.error}</p>}
+				{!store.loading && filteredEvents.length === 0 && (
 					<p>No tienes eventos en esta categoría</p>
 				)}
-				{!loading && filteredEvents.length > 0 && (
+				{!store.loading && filteredEvents.length > 0 && (
 					<table className="events-table">
 						<thead>
 							<tr>
