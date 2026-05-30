@@ -2054,3 +2054,58 @@ h6 {
     padding: 0 0.5rem;
   }
 }
+
+/* New classes extracted from inline styles */
+.create-event-alert {
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: #fdf2f0;
+    border: 1px solid #f6d1cc;
+    color: #7b2416;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.no-underline-link {
+    text-decoration: none;
+}
+
+.protected-route-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fdfdf6;
+}
+
+.protected-route-logo {
+    width: 100px;
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+.protected-route-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.protected-route-text {
+    margin: 0;
+    font-family: monospace;
+    color: #6c6159;
+}
+
+.map-wrapper {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+}
+
+.map-iframe {
+    border: none;
+    filter: grayscale(0.2);
+}

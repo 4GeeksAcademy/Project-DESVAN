@@ -1229,3 +1229,7 @@
   .gallery-nav-prev { left: 8px; }
   .gallery-nav-next { right: 8px; }
 }
+
+.remaining-seats {
+  margin: 6px 0 10px;
+}

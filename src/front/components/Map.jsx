@@ -32,10 +32,7 @@ export const Map = ({
                 height="100%"
                 frameBorder="0"
                 src={mapUrl}
-                style={{
-                    border: "none",
-                    filter: "grayscale(0.2)"
-                }}
+                className="map-iframe"
                 allowFullScreen
                 loading="lazy"
             />

@@ -167,7 +167,7 @@ export const MyEvents = () => {
 
 			<div className="events-table-card">
 				{store.loading && <p>Cargando tus eventos...</p>}
-				{store.error && <p style={{ color: "red" }}>{store.error}</p>}
+				{store.error && <p className="account-error-text">{store.error}</p>}
 				{!store.loading && filteredEvents.length === 0 && (
 					<p>No tienes eventos en esta categoría</p>
 				)}
@@ -199,14 +199,7 @@ export const MyEvents = () => {
 													aria-hidden="true"
 												>
 													<i
-														className="fa-regular fa-image"
-														style={{
-															display: "flex",
-															alignItems: "center",
-															justifyContent: "center",
-															height: "100%",
-															color: "#b0a099",
-														}}
+														className="fa-regular fa-image events-table-thumb-icon"
 													/>
 												</div>
 											)}

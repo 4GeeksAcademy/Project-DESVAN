@@ -317,7 +317,7 @@ export const Details = () => {
             <div className="card-limited">
               <h3>Aforo limitado</h3>
               {event.max_capacity != null && (
-                <p style={{ margin: "6px 0 10px" }}>{remainingSeats > 0 ? `${remainingSeats} plazas disponibles` : "Agotado"}</p>
+                <p className="remaining-seats">{remainingSeats > 0 ? `${remainingSeats} plazas disponibles` : "Agotado"}</p>
               )}
               {event.seller?.id === store.user?.id ? (
                 <button className="btn-evaluate btn-evaluate--disabled" disabled>

@@ -15,11 +15,11 @@ export const ProtectedRoute = () => {
     // mostramos una pantalla de carga para evitar "flickering" o errores.
     if (store.userLoading) {
         return (
-            <div style={{ height: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", backgroundColor: "#fdfdf6" }}>
-                <img src={mascotafav} alt="Cargando..." style={{ width: "100px", opacity: 0.7, marginBottom: "20px" }} />
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div className="protected-route-container">
+                <img src={mascotafav} alt="Cargando..." className="protected-route-logo" />
+                <div className="protected-route-loading">
                     <span className="spinner"></span>
-                    <p style={{ margin: 0, fontFamily: "monospace", color: "#6c6159" }}>Cargando tus datos...</p>
+                    <p className="protected-route-text">Cargando tus datos...</p>
                 </div>
             </div>
         );

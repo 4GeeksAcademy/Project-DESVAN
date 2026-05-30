@@ -135,8 +135,7 @@ export const Reservations = () => {
 									<div className="reservation-card-actions">
 										<div className="reservation-qr">
 											<div
-												className="account-img-placeholder"
-												style={{ width: 48, height: 48, background: "#555" }}
+												className="account-img-placeholder account-image-skeleton"
 												aria-hidden="true"
 											/>
 										</div>
