@@ -107,6 +107,11 @@ const updateEvent = async (eventId, eventData) => {
   }
 };
 
+// reactivar un evento (wrapper sobre updateEvent)
+const reactivateEvent = async (eventId) => {
+  return updateEvent(eventId, { status: 'active' });
+};
+
 //eliminar un evento
 const deleteEvent = async (eventId) => {
   try {
@@ -156,36 +161,13 @@ const getNearbyEvents = async (latitude, longitude, distance = 10) => {
   }
 };
 
-const getCategories = async () => {
-  try {
-    const resp = await fetch(url + "api/category");
-    if (!resp.ok) throw new Error("Error getting categories");
-    const data = await resp.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const getTags = async () => {
-  try {
-    const resp = await fetch(url + "api/tag");
-    if (!resp.ok) throw new Error("Error getting tags");
-    const data = await resp.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 export default {
   createEvent,
   getEvents,
   getEventsPublic,
   getEvent,
   updateEvent,
+  reactivateEvent,
   deleteEvent,
   getNearbyEvents,
-  getCategories,
-  getTags,
 };
