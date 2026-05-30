@@ -107,6 +107,11 @@ const updateEvent = async (eventId, eventData) => {
   }
 };
 
+// reactivar un evento (wrapper sobre updateEvent)
+const reactivateEvent = async (eventId) => {
+  return updateEvent(eventId, { status: 'active' });
+};
+
 //eliminar un evento
 const deleteEvent = async (eventId) => {
   try {
@@ -184,6 +189,7 @@ export default {
   getEventsPublic,
   getEvent,
   updateEvent,
+  reactivateEvent,
   deleteEvent,
   getNearbyEvents,
   getCategories,

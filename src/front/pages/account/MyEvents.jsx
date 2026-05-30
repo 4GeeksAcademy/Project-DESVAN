@@ -6,28 +6,35 @@ import eventService from "../../services/event.service";
 import authService from "../../services/auth.service";
 import mascotamyev from "../../assets/img/caja02.png";
 
-const TABS = ["TODOS", "ACTIVOS", "FINALIZADOS"];
+const TABS = ["TODOS", "ACTIVOS", "FINALIZADOS", "CANCELADOS"];
 
 const ACTION_ICONS = {
 	edit: "fa-solid fa-pen",
 	duplicate: "fa-regular fa-copy",
 	delete: "fa-solid fa-trash",
+	cancel: "fa-solid fa-ban",
+	reactivate: "fa-solid fa-rotate-right",
 };
 
 const STATUS_MAP = {
 	active: "ACTIVO",
 	finished: "FINALIZADO",
+	cancelled: "CANCELADO",
 };
 
 const STATUS_VARIANT_MAP = {
 	active: "activo",
 	finished: "finalizado",
+	cancelled: "cancelado",
 };
+
 
 export const MyEvents = () => {
 	const [activeTab, setActiveTab] = useState("TODOS");
 	const [userEvents, setUserEvents] = useState([]);
 	const [eventToDelete, setEventToDelete] = useState(null);
+	const [eventToCancel, setEventToCancel] = useState(null);
+	const [eventToReactivate, setEventToReactivate] = useState(null);
 	const { store, dispatch, showErrorAlert } = useGlobalReducer();
 	const navigate = useNavigate();
 
@@ -77,6 +84,10 @@ export const MyEvents = () => {
 	}, [store.user, store.userLoading, dispatch]);
 
 	const getEventStatusKey = (event) => {
+		// Priorizar estado explícito desde la API
+		if (event.status === "cancelled") return "cancelled";
+		if (event.status === "finished") return "finished";
+
 		const now = new Date();
 		if (event.end_time) {
 			if (new Date(event.end_time) < now) return "finished";
@@ -85,7 +96,7 @@ export const MyEvents = () => {
 			endDate.setHours(23, 59, 59, 999);
 			if (endDate < now) return "finished";
 		}
-		if (event.status === "finished") return "finished";
+
 		return "active";
 	};
 
@@ -98,6 +109,7 @@ export const MyEvents = () => {
 			const eventStatus = STATUS_MAP[statusKey];
 			if (activeTab === "ACTIVOS") return eventStatus === "ACTIVO";
 			if (activeTab === "FINALIZADOS") return eventStatus === "FINALIZADO";
+			if (activeTab === "CANCELADOS") return eventStatus === "CANCELADO";
 			return false;
 		});
 	};
@@ -144,6 +156,39 @@ export const MyEvents = () => {
 		}
 	};
 
+	// Cancelar: marcar evento como cancelled via update
+	const handleCancel = async (eventId) => {
+		try {
+			dispatch({ type: 'setLoading', payload: true });
+			const resp = await eventService.updateEvent(eventId, { status: 'cancelled' });
+			if (!resp) throw new Error('Error al cancelar');
+			// actualizar estado local
+			setUserEvents((prev) => prev.map((e) => (e.id === eventId ? { ...e, status: 'cancelled' } : e)));
+			setEventToCancel(null);
+		} catch (err) {
+			console.error(err);
+			alert('No se pudo cancelar el evento');
+		} finally {
+			dispatch({ type: 'setLoading', payload: false });
+		}
+	};
+
+	// Reactivar: marcar evento como active via servicio
+	const handleReactivate = async (eventId) => {
+		try {
+			dispatch({ type: 'setLoading', payload: true });
+			const resp = await eventService.reactivateEvent(eventId);
+			if (!resp) throw new Error('Error al reactivar');
+			setUserEvents((prev) => prev.map((e) => (e.id === eventId ? { ...e, status: 'active' } : e)));
+			setEventToReactivate(null);
+		} catch (err) {
+			console.error(err);
+			alert('No se pudo reactivar el evento');
+		} finally {
+			dispatch({ type: 'setLoading', payload: false });
+		}
+	};
+
 	return (
 		<div className="my-events-page">
 			<img src={mascotamyev} alt="" className="account-mascot-float" aria-hidden="true" />
@@ -167,7 +212,7 @@ export const MyEvents = () => {
 
 			<div className="events-table-card">
 				{store.loading && <p>Cargando tus eventos...</p>}
-				{store.error && <p style={{ color: "red" }}>{store.error}</p>}
+				{store.error && <p className="account-error-text">{store.error}</p>}
 				{!store.loading && filteredEvents.length === 0 && (
 					<p>No tienes eventos en esta categoría</p>
 				)}
@@ -187,26 +232,19 @@ export const MyEvents = () => {
 								<tr key={event.id}>
 									<td>
 										<div className="events-table-event">
-									{(event.image_url?.cover || event.image_url?.gallery?.[0]) ? (
-										<img
-											src={event.image_url?.cover || event.image_url?.gallery?.[0]}
-											alt={event.title}
-											className="events-table-thumb"
-										/>
-									) : (
+											{(event.image_url?.cover || event.image_url?.gallery?.[0]) ? (
+												<img
+													src={event.image_url?.cover || event.image_url?.gallery?.[0]}
+													alt={event.title}
+													className="events-table-thumb"
+												/>
+											) : (
 												<div
 													className="events-table-thumb account-img-placeholder"
 													aria-hidden="true"
 												>
 													<i
-														className="fa-regular fa-image"
-														style={{
-															display: "flex",
-															alignItems: "center",
-															justifyContent: "center",
-															height: "100%",
-															color: "#b0a099",
-														}}
+														className="fa-regular fa-image events-table-thumb-icon"
 													/>
 												</div>
 											)}
@@ -235,6 +273,28 @@ export const MyEvents = () => {
 											>
 												<i className={ACTION_ICONS["edit"]} />
 											</button>
+											{getEventStatusKey(event) !== 'cancelled' && (
+												<button
+													type="button"
+													className="events-table-action-btn"
+													aria-label="cancel"
+													title="Cancelar evento"
+													onClick={() => setEventToCancel(event)}
+												>
+													<i className={ACTION_ICONS["cancel"]} />
+												</button>
+											)}
+											{getEventStatusKey(event) === 'cancelled' && (
+												<button
+													type="button"
+													className="events-table-action-btn"
+													aria-label="reactivate"
+													title="Reactivar evento"
+													onClick={() => setEventToReactivate(event)}
+												>
+													<i className={ACTION_ICONS["reactivate"]} />
+												</button>
+											)}
 											<button
 												type="button"
 												className="events-table-action-btn"
@@ -283,6 +343,98 @@ export const MyEvents = () => {
 								onClick={() => handleDelete(eventToDelete.id)}
 							>
 								Eliminar evento
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+			{eventToReactivate && (
+				<div className="delete-event-backdrop" onClick={() => setEventToReactivate(null)}>
+					<div className="delete-event-modal" onClick={(e) => e.stopPropagation()}>
+						<div className="delete-event-modal-header">
+							<h3>Reactivar evento</h3>
+							<button
+								type="button"
+								className="events-table-action-btn"
+								onClick={() => setEventToReactivate(null)}
+								aria-label="Cerrar modal"
+							>
+								<i className="fa-solid fa-xmark" />
+							</button>
+						</div>
+						{(() => {
+							const now = new Date();
+							let isPast = false;
+							if (eventToReactivate.end_time) {
+								isPast = new Date(eventToReactivate.end_time) < now;
+							} else if (eventToReactivate.end_date) {
+								const endDate = new Date(eventToReactivate.end_date);
+								endDate.setHours(23, 59, 59, 999);
+								isPast = endDate < now;
+							}
+							return (
+								<>
+									<p className="delete-event-modal-text">
+										¿Estás seguro de que quieres reactivar el evento <strong>{eventToReactivate.title}</strong>? Los usuarios volverán a ver el evento como activo.
+									</p>
+									{isPast && (
+										<p className="delete-event-modal-text" style={{ color: '#b45309' }}>
+											Advertencia: la fecha del evento ya ha pasado. Aunque lo reactives, no será posible que usuarios hagan reservas para fechas pasadas.
+										</p>
+									)}
+									<div className="delete-event-modal-actions">
+										<button
+											type="button"
+											className="delete-event-modal-btn delete-event-modal-btn--cancel"
+											onClick={() => setEventToReactivate(null)}
+										>
+											Cancelar
+										</button>
+										<button
+											type="button"
+											className="delete-event-modal-btn delete-event-modal-btn--delete"
+											onClick={() => handleReactivate(eventToReactivate.id)}
+										>
+											Reactivar evento
+										</button>
+									</div>
+							</>
+							);
+						})()}
+					</div>
+				</div>
+			)}
+			{eventToCancel && (
+				<div className="delete-event-backdrop" onClick={() => setEventToCancel(null)}>
+					<div className="delete-event-modal" onClick={(e) => e.stopPropagation()}>
+						<div className="delete-event-modal-header">
+							<h3>Cancelar evento</h3>
+							<button
+								type="button"
+								className="events-table-action-btn"
+								onClick={() => setEventToCancel(null)}
+								aria-label="Cerrar modal"
+							>
+								<i className="fa-solid fa-xmark" />
+							</button>
+						</div>
+						<p className="delete-event-modal-text">
+							¿Estás seguro de que quieres cancelar el evento <strong>{eventToCancel.title}</strong>? Los usuarios no podrán reservar ni ver el evento como activo.
+						</p>
+						<div className="delete-event-modal-actions">
+							<button
+								type="button"
+								className="delete-event-modal-btn delete-event-modal-btn--cancel"
+								onClick={() => setEventToCancel(null)}
+							>
+								Cancelar
+							</button>
+							<button
+								type="button"
+								className="delete-event-modal-btn delete-event-modal-btn--delete"
+								onClick={() => handleCancel(eventToCancel.id)}
+							>
+								Cancelar evento
 							</button>
 						</div>
 					</div>

@@ -327,17 +327,7 @@ export const CreateEvent = () => {
 
                 {/* Feedback Messages */}
                 {store.error && (
-                    <div className="create-event-alert" style={{
-                        padding: "1rem", 
-                        borderRadius: "10px", 
-                        backgroundColor: "#fdf2f0", 
-                        border: "1px solid #f6d1cc", 
-                        color: "#7b2416", 
-                        marginBottom: "1.5rem", 
-                        display: "flex", 
-                        alignItems: "center", 
-                        gap: "0.75rem"
-                    }}>
+                    <div className="create-event-alert">
                         <i className="fa-solid fa-circle-exclamation"></i>
                         <span>{store.error}</span>
                     </div>

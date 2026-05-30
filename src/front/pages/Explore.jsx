@@ -429,7 +429,7 @@ export const Explore = () => {
                     <div className="explore-header">
                         <div className="explore-header-left">
                             <h1 className="explore-title">Rastros para ti</h1>
-                            <div class="create-event-title-line"></div>
+                            <div className="create-event-title-line"></div>
                             <p className="explore-subtitle">Descubre tesoros ocultos.</p>
                         </div>
                         <div className="sort-control">
@@ -631,7 +631,7 @@ export const Explore = () => {
                         })}
 
                         {/* Discover more card */}
-                        <div className="event-card discover-card">
+                        <div key="discover-card" className="event-card discover-card">
                             <div className="discover-inner">
                                 <img src={caja05} alt="mascota" className="discover-mascot" />
                                 <h3 className="discover-title">Descubre más</h3>

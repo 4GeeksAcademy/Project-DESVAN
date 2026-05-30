@@ -2087,3 +2087,216 @@
     min-width: 640px;
   }
 }
+
+.account-image-skeleton {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--account-red);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.delete-account-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--account-border);
+  background: #fff;
+  color: var(--account-brown-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.delete-account-modal-close:hover {
+  border-color: var(--account-red);
+  color: var(--account-red);
+}
+
+.delete-account-modal-text {
+  font-family: var(--account-font-sans);
+  font-size: 0.92rem;
+  color: var(--account-brown-muted);
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+}
+
+.delete-account-modal-text strong {
+  color: var(--account-brown);
+}
+
+.delete-account-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.delete-account-modal-btn {
+  min-width: 110px;
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--account-font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s;
+}
+
+.delete-account-modal-btn:hover {
+  transform: translateY(-1px);
+}
+
+.delete-account-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.delete-account-modal-btn--cancel {
+  background: #f7f1ec;
+  color: var(--account-brown-muted);
+  border-color: #eaded1;
+}
+
+.delete-account-modal-btn--delete {
+  background: var(--account-red);
+  color: #ffffff;
+  border-color: var(--account-red);
+}
+
+.delete-account-modal-btn--delete:hover:not(:disabled) {
+  background: var(--account-red-hover);
+  box-shadow: 0 4px 16px rgba(123, 36, 22, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 1200px) {
+  .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 991.98px) {
+  .account-layout {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .account-sidebar-wrap {
+    position: static;
+  }
+
+  .account-sidebar {
+    width: 100%;
+    max-height: none;
+  }
+
+  .account-nav-link--active::before {
+    display: none;
+  }
+
+  .collector-file-body {
+    grid-template-columns: 1fr;
+  }
+
+  .reservations-layout {
+    flex-direction: column;
+  }
+
+  .reservations-summary {
+    width: 100%;
+    position: static;
+  }
+
+  .reservation-card {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-card-image img,
+  .reservation-card-image .account-img-placeholder {
+    min-height: 160px;
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .account-layout {
+    padding-top: 1.5rem;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .collector-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page-header {
+    flex-direction: column;
+  }
+
+  .events-table-card {
+    overflow-x: auto;
+  }
+
+  .events-table {
+    min-width: 640px;
+  }
+}
+
+.account-image-skeleton {
+  width: 48px;
+  height: 48px;
+  background: #555;
+}
+
+.account-error-text {
+  color: red;
+}
+
+.events-table-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #b0a099;
+}
