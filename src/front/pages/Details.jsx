@@ -357,12 +357,25 @@ export const Details = () => {
                 )}
               </div>
               <div className="seller-card-info">
-                <span className="seller-handle">
-                  @{event.seller?.username || event.seller?.email?.split("@")[0] || "vendedor"}
-                </span>
-                <p className="seller-name">
-                  {event.seller?.full_name || event.seller?.username || "Vendedor"}
-                </p>
+                {event.seller?.id ? (
+                  <Link to={`/vendedor/${event.seller.id}`} className="seller-profile-link">
+                    <span className="seller-handle">
+                      @{event.seller?.username || event.seller?.email?.split("@")[0] || "vendedor"}
+                    </span>
+                    <p className="seller-name">
+                      {event.seller?.full_name || event.seller?.username || "Vendedor"}
+                    </p>
+                  </Link>
+                ) : (
+                  <>
+                    <span className="seller-handle">
+                      @{event.seller?.username || event.seller?.email?.split("@")[0] || "vendedor"}
+                    </span>
+                    <p className="seller-name">
+                      {event.seller?.full_name || event.seller?.username || "Vendedor"}
+                    </p>
+                  </>
+                )}
                 <div className="seller-rating">
                   {event.seller?.user_rating || event.event_rating ? (
                     <>

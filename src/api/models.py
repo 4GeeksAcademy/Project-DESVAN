@@ -190,6 +190,21 @@ class Event (db.Model):  # ESTA TABLA DEBE IR ARRIBA?
             "image_url": self.image_url,
         }
 
+    def event_card_serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "image_url": self.image_url,
+            "event_type": self.event_type.value if self.event_type else None,
+            "exact_address": self.exact_address,
+            "start_time": self.start_time.isoformat() if self.start_time else None,
+            "end_time": self.end_time.isoformat() if self.end_time else None,
+            "start_date": self.start_date.isoformat() if self.start_date else None,
+            "status": self.status.value if self.status else None,
+            "event_rating": self.event_rating,
+        }
+
     def serialize(self):
         return {
             "id": self.id,
@@ -313,6 +328,26 @@ class Review (db.Model):
 
         }
 
+    def public_serialize(self):
+        created_at = self.created_at
+        if created_at and hasattr(created_at, "isoformat"):
+            created_at = created_at.isoformat()
+        return {
+            "id": self.id,
+            "rating": float(self.rating) if self.rating is not None else None,
+            "comment": self.comment,
+            "created_at": created_at,
+            "reviewer": {
+                "id": self.reviewer_id,
+                "username": self.reviewer.username if self.reviewer else None,
+                "profile_picture_url": self.reviewer.profile_picture_url if self.reviewer else None,
+            } if self.reviewer else None,
+            "event": {
+                "id": self.event_id,
+                "title": self.event.title
+            } if self.event else None,
+        }
+
 
 class User(db.Model):
     __tablename__ = "users"
@@ -380,6 +415,43 @@ class User(db.Model):
             "my_received_reviews": [my_received_reviews.serialize() for my_received_reviews in self.my_received_reviews] if self.my_received_reviews else None,
             "favorites": [favorite.serialize() for favorite in self.favorites]
             # do not serialize the password, its a security breach
+        }
+
+    def public_profile_serialize(self):
+        full_name = self.username
+        if self.profile:
+            name = f"{self.profile.firstname} {self.profile.lastname}".strip()
+            if name:
+                full_name = name
+
+        active_events = [
+            event for event in (self.events or [])
+            if event.status == EventStatus.active
+        ]
+        active_events.sort(
+            key=lambda e: e.start_time or datetime.min.replace(tzinfo=timezone.utc),
+            reverse=True,
+        )
+
+        received_reviews = sorted(
+            self.my_received_reviews or [],
+            key=lambda r: r.created_at or datetime.min.replace(tzinfo=timezone.utc),
+            reverse=True,
+        )
+
+        return {
+            "id": self.id,
+            "username": self.username,
+            "full_name": full_name,
+            "bio": self.bio,
+            "profile_picture_url": self.profile_picture_url,
+            "is_verified": self.is_verified,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "user_rating": self.user_rating,
+            "reviews_count": len(received_reviews),
+            "events_count": len(active_events),
+            "events": [event.event_card_serialize() for event in active_events],
+            "received_reviews": [review.public_serialize() for review in received_reviews],
         }
 
 

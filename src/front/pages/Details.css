@@ -515,6 +515,27 @@
   gap: 0.28rem;
 }
 
+.seller-profile-link {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  transition: opacity 0.2s;
+}
+
+.seller-profile-link:hover {
+  opacity: 0.85;
+}
+
+.seller-profile-link .seller-handle,
+.seller-profile-link .seller-name {
+  transition: color 0.2s;
+}
+
+.seller-profile-link:hover .seller-name {
+  color: var(--text-red);
+}
+
 .seller-handle {
   color: #8c7a72;
   font-size: 0.82rem;
@@ -1248,3 +1269,4 @@
   cursor: not-allowed;
   width: 100%;
 }
+

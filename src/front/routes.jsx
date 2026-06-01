@@ -21,6 +21,7 @@ import { Reservations } from "./pages/account/Reservations";
 import { MyEvents } from "./pages/account/MyEvents";
 import { Reviews } from "./pages/account/Reviews";
 import { Details } from "./pages/Details"
+import PublicProfile from "./pages/PublicProfile";
 
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -39,6 +40,7 @@ export const router = createBrowserRouter(
         {/* Rutas que comparten Layout y requieren autenticación */}
         <Route element={<ProtectedRoute />}>
           <Route path="/crear-evento" element={<CreateEvent />} />
+          <Route path="/vendedor/:userId" element={<PublicProfile />} />
         </Route>
         
         <Route path="/detalles/:eventId" element={<Details />} />
