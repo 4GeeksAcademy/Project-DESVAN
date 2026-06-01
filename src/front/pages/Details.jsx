@@ -409,7 +409,7 @@ export const Details = () => {
           </div>
 
           <div className="card-sidebar-white">
-            <h3 className="sidebar-title">Información</h3>
+            <h3 className="details-info-title">Información</h3>
 
             <div className="sidebar-info-list">
 

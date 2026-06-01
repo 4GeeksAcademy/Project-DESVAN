@@ -2424,6 +2424,8 @@ h6 {
   .notfound-card {
     padding: 2rem 1.5rem;
   }
+}
+
 /* ── NOTIFICATION BELL ── */
 .notification-bell {
     position: relative;
@@ -2442,7 +2444,7 @@ h6 {
 }
 
 .notification-ico {
-    height: 35px;
+    height: 2rem;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
