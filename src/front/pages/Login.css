@@ -1,0 +1,724 @@
+/* 
+  AUTHENTICATION PAGES STYLESheet (Login & Register)
+  Designed for a high-end, vintage-premium look ("Desván" Theme)
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300..900&display=swap');
+
+:root {
+  /* Vintage & Antique Theme Palette */
+  --auth-bg-cream: #FFFBF7;
+  --auth-bg-sidebar: #eedfc5;
+  --auth-text-dark: #3d271d;
+  --auth-text-muted: #7c685c;
+  --auth-brand-red: #7b2416;
+  --auth-brand-red-hover: #5d190e;
+  --auth-border-color: #d8cebf;
+  --auth-border-focus: #b5927a;
+  --auth-card-bg: #FCF9F5;
+  
+  /* Typography */
+  --auth-font-serif: 'Fraunces', serif;
+  --auth-font-sans: 'Outfit', sans-serif;
+  --auth-font-mono: 'Courier Prime', monospace;
+}
+
+/* Page Layout Container */
+.auth-page-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--auth-bg-cream);
+  font-family: var(--auth-font-sans);
+  color: var(--auth-text-dark);
+  display: flex;
+}
+
+/* ── 1. DECORATIVE SIDEBAR (38% Width) ── */
+.auth-sidebar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 38vw;
+  z-index: 10;
+  background-image: url('../assets/img/fondo.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: space;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4rem 3rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Overlay semi-transparente para mejorar legibilidad del texto sobre la foto */
+.auth-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar Slide Content Wrapper */
+.sidebar-content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  margin-top: 2rem;
+}
+
+/* Smooth opacity crossfade inside sidebar */
+.sidebar-slide-content {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  width: 100%;
+}
+
+.sidebar-slide-content.slide-in {
+  animation: fadeInRight 0.5s forwards ease-out;
+}
+
+.sidebar-slide-content.slide-out {
+  animation: fadeInLeft 0.5s forwards ease-out;
+}
+
+/* Vintage Header Typography */
+.sidebar-title {
+  font-family: var(--auth-font-serif);
+  font-size: 4.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+  color: var(--auth-text-dark);
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* Short separator line */
+.vintage-divider {
+  width: 40px;
+  height: 3px;
+  background-color: var(--auth-brand-red);
+  margin: 1.5rem 0;
+  border-radius: 2px;
+}
+
+.sidebar-subtitle {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--auth-text-muted);
+  margin: 0 0 2rem 0;
+  font-weight: 400;
+}
+
+/* Torn paper edge effect */
+.torn-paper-edge {
+  display: none;
+}
+
+/* ── 2. VINTAGE POSTMARK STAMP ── */
+.vintage-postmark {
+  display: flex;
+  align-items: center;
+  transform: rotate(-10deg);
+  margin-bottom: 2rem;
+  user-select: none;
+  opacity: 0.85;
+}
+
+.stamp-circle {
+  width: 75px;
+  height: 75px;
+  border: 2px dashed var(--auth-brand-red);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 5px;
+}
+
+.stamp-text {
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--auth-brand-red);
+  text-transform: uppercase;
+  font-family: var(--auth-font-sans);
+}
+
+.stamp-icon {
+  font-size: 1.15rem;
+  color: var(--auth-brand-red);
+  margin: 2px 0;
+}
+
+.stamp-lines {
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wave-line {
+  width: 50px;
+  height: 2px;
+  background-color: var(--auth-brand-red);
+  border-radius: 1px;
+}
+
+/* ── 3. MASCOT CONTAINER & CSS FALLBACKS ── */
+.mascot-container {
+  width: 100%;
+  height: 360px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+/* 
+  Fallback CSS animations for the mascots to look absolutely beautiful
+  even if the user hasn't added the actual mascot images.
+*/
+.mascot-image {
+  width: 500px;
+  height: 500px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  animation: hoverFloat 4s ease-in-out infinite;
+}
+
+/* Waving Mascot Style & Fallback */
+.mascot-waving {
+  background-image: url('../assets/img/mascota.png');
+  width: 500px;
+  height: 500px;
+}
+
+/* Forgot Password Mascot */
+.mascot-forgot {
+  background-image: url('../assets/img/caja02.png');
+  width: 400px;
+  height: 400px;
+}
+
+/* Reading Mascot Style & Fallback */
+.mascot-reading {
+  background-image: url('../assets/img/Register_ico.png');
+  width: 400px;
+  height: 400px;
+}
+
+/* Fallback visual representation if images are not found */
+.mascot-image:not([style*="background-image"]), 
+.mascot-image[src=""], 
+.mascot-image {
+  background-color: transparent;
+  position: relative;
+}
+
+/* Adding shadow beneath mascots */
+.mascot-container::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  width: 230px;
+  height: 16px;
+  background: rgba(61, 39, 29, 0.15);
+  border-radius: 50%;
+  filter: blur(6px);
+  animation: shadowScale 4s ease-in-out infinite;
+}
+
+
+/* ── 4. FORM PANEL AREA (62% Width) ── */
+.auth-form-area {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 38vw;
+  width: 62vw;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 2rem;
+  
+  /* Premium sliding transition */
+  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ── 5. FORM CARD (High-Fidelity Vintage Design) ── */
+.auth-card {
+  width: 100%;
+  max-width: 520px;
+  background-color: var(--auth-card-bg);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(61, 39, 29, 0.08);
+  border: 1px solid rgba(181, 146, 122, 0.15);
+  padding: 3rem 2.5rem 2.25rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Card Header styles */
+.brand-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brand-box-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: #faf0eb;
+  border: 1px dashed var(--auth-brand-red);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.brand-box-icon i {
+  font-size: 1.4rem;
+  color: var(--auth-brand-red);
+  animation: boxPulse 3s ease-in-out infinite;
+}
+
+.auth-card-title {
+  font-family: var(--auth-font-sans);
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--auth-text-dark);
+  margin: 0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.auth-card-subtitle {
+  font-size: 0.88rem;
+  color: var(--auth-text-muted);
+  margin: 0.5rem 0 0 0;
+  line-height: 1.4;
+}
+
+/* Alerts styles */
+.auth-alert {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  line-height: 1.4;
+  animation: slideDown 0.3s ease-out;
+}
+
+.alert-danger {
+  background-color: #fdf2f0;
+  border: 1px solid #f6d1cc;
+  color: var(--auth-brand-red);
+}
+
+.alert-success {
+  background-color: #f0fdf4;
+  border: 1px solid #ccf6dd;
+  color: #166534;
+}
+
+/* Forms layout */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--auth-text-dark);
+  text-transform: uppercase;
+}
+
+.forgot-password-link {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--auth-text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.forgot-password-link:hover {
+  color: var(--auth-brand-red);
+  text-decoration: underline;
+}
+
+/* Input Fields styling */
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: #a39083;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.input-wrapper input,
+.form-group .input-wrapper input[type="text"] {
+  width: 100%;
+  padding: 0.95rem 1rem 0.95rem 2.65rem;
+  font-size: 0.9rem;
+  font-family: var(--auth-font-sans);
+  background-color: #ffffff;
+  border: 1.5px solid var(--auth-border-color);
+  border-radius: 12px;
+  color: var(--auth-text-dark);
+  box-shadow: 0 2px 4px rgba(61, 39, 29, 0.02);
+  transition: border-color 0.25s, box-shadow 0.25s;
+  box-sizing: border-box;
+}
+
+.input-wrapper input::placeholder {
+  color: #bfaea2;
+}
+
+.input-wrapper input:focus,
+.form-group .input-wrapper input[type="text"]:focus {
+  outline: none;
+  border-color: var(--auth-border-focus);
+  box-shadow: 0 0 0 4px rgba(181, 146, 122, 0.15);
+  background-color: #ffffff;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #a39083;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1rem;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle-btn:hover {
+  color: var(--auth-brand-red);
+}
+
+/* Submit Action Button */
+.auth-submit-btn {
+  background-color: var(--auth-brand-red);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 10px rgba(123, 36, 22, 0.2);
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  margin-top: 0.5rem;
+}
+
+.auth-submit-btn:hover {
+  background-color: var(--auth-brand-red-hover);
+  box-shadow: 0 6px 15px rgba(123, 36, 22, 0.3);
+  transform: translateY(-2px);
+}
+
+.auth-submit-btn:active {
+  transform: translateY(0);
+}
+
+.auth-submit-btn:disabled {
+  background-color: #bfaea2;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Button Loading Spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+/* Switcher / Switcher Toggler section */
+.auth-switcher-divider {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.monospace-text {
+  font-family: var(--auth-font-mono);
+  font-size: 0.78rem;
+  color: var(--auth-text-muted);
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.5px;
+}
+
+.auth-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--auth-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.auth-toggle-btn:hover {
+  background-color: rgba(61, 39, 29, 0.04);
+}
+
+.highlight-link {
+  color: var(--auth-brand-red);
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.auth-toggle-btn:hover .highlight-link {
+  text-decoration: underline;
+}
+
+.font-icon-left {
+  margin-right: 6px;
+  font-size: 0.9rem;
+}
+
+.font-icon-right {
+  margin-right: 3px;
+  font-size: 0.8rem;
+}
+
+.mt-4 {
+  margin-top: 1.25rem !important;
+}
+
+/* ── 6. VALUE PROPOSITIONS FOOTER ── */
+.auth-card-footer {
+  margin-top: 2.25rem;
+  padding-top: 1.75rem;
+  border-top: 1.5px dashed var(--auth-border-color);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.value-prop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  text-align: left;
+}
+
+.value-prop-header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.val-icon {
+  font-size: 0.8rem;
+  color: var(--auth-brand-red);
+}
+
+.value-prop h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--auth-text-dark);
+}
+
+.value-prop p {
+  font-size: 0.62rem;
+  font-family: var(--auth-font-mono);
+  color: var(--auth-text-muted);
+  margin: 0;
+  line-height: 1.35;
+}
+
+
+/* ── 7. DOUBLE-SLIDING MODE TRIGGERS ── */
+/* When .register-mode class is active, swap positions! */
+.auth-page-container.register-mode .auth-sidebar {
+  transform: translateX(62vw);
+}
+
+.auth-page-container.register-mode .torn-paper-edge {
+  right: auto;
+  left: -8px;
+}
+
+.auth-page-container.register-mode .auth-form-area {
+  transform: translateX(-38vw);
+}
+
+
+/* ── 8. KEYFRAME ANIMATIONS ── */
+@keyframes hoverFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shadowScale {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes boxPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* ── 9. FULL RESPONSIVE FALLBACKS ── */
+@media (max-width: 992px) {
+  .auth-sidebar {
+    display: none; /* Hide the sidebar on tablet & mobile */
+  }
+  
+  .auth-form-area {
+    left: 0;
+    width: 100vw;
+    padding: 1.5rem;
+  }
+  
+  .auth-page-container.register-mode .auth-form-area {
+    transform: none; /* Disable shift in mobile */
+  }
+  
+  .auth-card {
+    padding: 2.25rem 1.75rem 1.75rem;
+    box-shadow: 0 10px 25px rgba(61, 39, 29, 0.05);
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card-footer {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-top: 1.25rem;
+  }
+  
+  .value-prop {
+    text-align: center;
+    align-items: center;
+  }
+  
+  .value-prop-header {
+    justify-content: center;
+  }
+  
+  .auth-card-title {
+    font-size: 1.75rem;
+  }
+}
