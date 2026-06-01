@@ -44,7 +44,11 @@ app.config["MAIL_DEFAULT_SENDER"] = os.getenv(
     "MAIL_DEFAULT_SENDER", "no-reply@el-desvan.com")
 app.config["MAIL_SUPPRESS_SEND"] = os.getenv(
     "FLASK_MAIL_SUPPRESS_SEND", "false").lower() in ("true", "1", "yes")
-MIGRATE = Migrate(app, db, compare_type=True)
+MIGRATIONS_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+    "migrations"
+)
+MIGRATE = Migrate(app, db, compare_type=True, directory=MIGRATIONS_DIR)
 db.init_app(app)
 mail.init_app(app)
 jwt = JWTManager(app)
