@@ -43,20 +43,16 @@
   left: 0;
   width: 38vw;
   z-index: 10;
-  background-color: var(--auth-bg-sidebar);
-  background-image: url('../assets/img/Fondo_Login_1.png');
-  background-size: cover;
+  background-image: url('../assets/img/fondo.png');
   background-position: center;
-  background-repeat: no-repeat;
+  background-size: cover;
+  background-repeat: space;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 4rem 3rem;
   box-sizing: border-box;
   overflow: hidden;
-  box-shadow: inset -5px 0 15px rgba(0, 0, 0, 0.15);
-
-  /* Premium sliding transition */
   transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
@@ -65,7 +61,6 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(238, 223, 197, 0.45);
   pointer-events: none;
   z-index: 0;
 }
@@ -102,12 +97,12 @@
 /* Vintage Header Typography */
 .sidebar-title {
   font-family: var(--auth-font-serif);
-  font-size: 2.75rem;
+  font-size: 500px;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.1;
   margin: 0;
   color: var(--auth-text-dark);
-  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.4);
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 /* Short separator line */
@@ -120,7 +115,7 @@
 }
 
 .sidebar-subtitle {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   line-height: 1.5;
   color: var(--auth-text-muted);
   margin: 0 0 2rem 0;
@@ -187,12 +182,12 @@
 /* ── 3. MASCOT CONTAINER & CSS FALLBACKS ── */
 .mascot-container {
   width: 100%;
-  height: 260px;
+  height: 360px;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* 
@@ -200,8 +195,8 @@
   even if the user hasn't added the actual mascot images.
 */
 .mascot-image {
-  width: 200px;
-  height: 200px;
+  width: 500px;
+  height: 500px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center bottom;
@@ -239,11 +234,11 @@
   content: '';
   position: absolute;
   bottom: 10px;
-  width: 160px;
-  height: 12px;
+  width: 230px;
+  height: 16px;
   background: rgba(61, 39, 29, 0.15);
   border-radius: 50%;
-  filter: blur(4px);
+  filter: blur(6px);
   animation: shadowScale 4s ease-in-out infinite;
 }
 
