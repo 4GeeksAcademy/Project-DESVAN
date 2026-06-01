@@ -26,6 +26,21 @@ class ReservationStatus(enum.Enum):
     attended = "attended"
 
 
+class NotificationType(enum.Enum):
+    reservation_created = "reservation_created"
+    review_received = "review_received"
+    event_cancelled = "event_cancelled"
+    event_upcoming = "event_upcoming"
+
+
+class ReportReason(enum.Enum):
+    spam = "spam"
+    inappropriate_content = "inappropriate_content"
+    harassment = "harassment"
+    fraud = "fraud"
+    other = "other"
+
+
 class Category (db.Model):
     __tablename__ = "categories"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -350,6 +365,9 @@ class User(db.Model):
     # Relación
     favorites: Mapped[List["Favorite"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")
+    # 1-M
+    notifications: Mapped[List["Notification"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan")
 
     def serialize(self):
         return {
@@ -451,4 +469,52 @@ class EventTag(db.Model):
                 "id": self.event_id,
                 "title": self.event.title
             }
+        }
+
+
+class Report(db.Model):
+    __tablename__ = "reports"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reason: Mapped[ReportReason] = mapped_column(Enum(ReportReason), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=True)
+    is_resolved: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc))
+
+    reporter_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    reported_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "reason": self.reason.value,
+            "message": self.message,
+            "is_resolved": self.is_resolved,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "reporter_id": self.reporter_id,
+            "reported_id": self.reported_id,
+        }
+
+
+class Notification(db.Model):
+    __tablename__ = "notifications"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    type: Mapped[NotificationType] = mapped_column(Enum(NotificationType), nullable=False)
+    message: Mapped[str] = mapped_column(String(500), nullable=False)
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    related_event_id: Mapped[int] = mapped_column(ForeignKey("events.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user: Mapped["User"] = relationship(back_populates="notifications")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "type": self.type.value,
+            "message": self.message,
+            "is_read": self.is_read,
+            "related_event_id": self.related_event_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
         }

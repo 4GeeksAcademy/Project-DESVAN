@@ -24,6 +24,7 @@ export const Explore = () => {
     const sortRef = useRef(null);
 
     const [favoriteMap, setFavoriteMap] = useState({});
+    const [filtersOpen, setFiltersOpen] = useState(false);
 
     // Estados para el mapa de eventos cercanos
     const [latitude, setLatitude] = useState(null);
@@ -144,7 +145,7 @@ export const Explore = () => {
             const distanceKm = parseInt(distance) || 10;
             const res = await eventService.getNearbyEvents(lat, lon, distanceKm);
             if (res?.data) {
-                setNearbyEvents(res.data);
+                setNearbyEvents(res.data.filter(item => item.event?.status !== 'cancelled'));
             }
         } catch (err) {
             console.log("Error fetching nearby events:", err);
@@ -342,6 +343,8 @@ export const Explore = () => {
     ];
 
     const filteredEvents = (events || []).filter(event => {
+        if (event.status === 'cancelled') return false;
+        if (getEventBadge(event)?.type === 'finalizado') return false;
         if (textQuery) {
             const q = textQuery.toLowerCase();
             const inTitle    = event.title?.toLowerCase().includes(q);
@@ -394,9 +397,17 @@ export const Explore = () => {
 
                 {/* ── Sidebar ── */}
                 <aside className="filters-sidebar">
-                    <div className="filters-panel">
-                        <h3 className="filters-heading">Filtros</h3>
-                        <p className="filters-sub">Refina tu búsqueda</p>
+                    <div className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}>
+                        <div className="filters-panel-header" onClick={() => setFiltersOpen(o => !o)}>
+                            <div>
+                                <h3 className="filters-heading">Filtros</h3>
+                                <p className="filters-sub">Refina tu búsqueda</p>
+                            </div>
+                            <button className="filters-toggle-btn" aria-label="Mostrar/ocultar filtros">
+                                <i className={`fa-solid fa-chevron-${filtersOpen ? "up" : "down"}`}></i>
+                            </button>
+                        </div>
+                        <div className="filters-panel-body">
                         <hr className="filters-hr" />
 
                         {/* Tipo de evento */}
@@ -487,6 +498,7 @@ export const Explore = () => {
                                 <i className="fa-solid fa-xmark"></i> Limpiar filtros
                             </button>
                         )}
+                        </div>
                     </div>
                 </aside>
 

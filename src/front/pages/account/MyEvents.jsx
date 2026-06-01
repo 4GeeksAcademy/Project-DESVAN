@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AccountPageHeader } from "../../components/account/AccountPageHeader";
 import useGlobalReducer from "../../hooks/useGlobalReducer";
 import eventService from "../../services/event.service";
@@ -239,6 +239,23 @@ export const MyEvents = () => {
 												className={`events-table-thumb${!(event.image_url?.cover || event.image_url?.gallery?.[0]) ? " img-fallback" : ""}`}
 											/>
 											<strong>{event.title}</strong>
+											{(event.image_url?.cover || event.image_url?.gallery?.[0]) ? (
+												<img
+													src={event.image_url?.cover || event.image_url?.gallery?.[0]}
+													alt={event.title}
+													className="events-table-thumb"
+												/>
+											) : (
+												<div
+													className="events-table-thumb account-img-placeholder"
+													aria-hidden="true"
+												>
+													<i
+														className="fa-regular fa-image events-table-thumb-icon"
+													/>
+												</div>
+											)}
+											<Link to={`/detalles/${event.id}`} className="events-table-title-link"><strong>{event.title}</strong></Link>
 										</div>
 									</td>
 									<td>
