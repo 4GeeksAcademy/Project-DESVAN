@@ -23,7 +23,6 @@ from api.custom_routes.user import *
 from api.custom_routes.upload import *
 from api.custom_routes.event import *
 from api.custom_routes.auth import *
-from api.custom_routes.test import *
 from api.custom_routes.notification import *
 from api.custom_routes.admin import *
 from api.custom_routes.report import *

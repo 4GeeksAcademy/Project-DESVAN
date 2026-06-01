@@ -1,81 +1,86 @@
-# WebApp boilerplate with React JS and Flask API
+# ✨ Desván
 
-Build web applications using React.js for the front end and python/flask for your backend API.
+[![GitHub stars](https://img.shields.io/github/stars/4GeeksAcademy/Project-DESVAN?style=flat-square)](https://github.com/4GeeksAcademy/Project-DESVAN/stargazers) [![GitHub forks](https://img.shields.io/github/forks/4GeeksAcademy/Project-DESVAN?style=flat-square)](https://github.com/4GeeksAcademy/Project-DESVAN/network/members) [![Built with](https://img.shields.io/badge/React%20%2B%20Flask-Modern-orange?style=flat-square)](https://github.com/4GeeksAcademy/Project-DESVAN)
 
-- Documentation can be found here: https://4geeks.com/docs/start/react-flask-template
-- Here is a video on [how to use this template](https://www.loom.com/share/f37c6838b3f1496c95111e515e83dd9b)
-- Integrated with Pipenv for package managing.
-- Fast deployment to Render [in just a few steps here](https://4geeks.com/docs/start/deploy-to-render-com).
-- Use of .env file.
-- SQLAlchemy integration for database abstraction.
+Una plataforma elegante para descubrir, explorar y reservar garage sales, open houses y eventos comunitarios al estilo de las ventas de garaje de Estados Unidos. Desván combina una interfaz moderna en React con una API en Flask para ofrecer una experiencia de usuario fluida y herramientas de publicación de eventos.
 
-### 1) Installation:
+---
 
-> If you use Github Codespaces (recommended) or Gitpod this template will already come with Python, Node and the Posgres Database installed. If you are working locally make sure to install Python 3.10, Node 
+**Estado:** En desarrollo ⚙️ • **Stack:** React + Vite • Flask (API) • SQLAlchemy
 
-It is recomended to install the backend first, make sure you have Python 3.10, Pipenv and a database engine (Posgress recomended)
+## ¿Qué es Desván?
 
-1. Install the python packages: `$ pipenv install`
-2. Create a .env file based on the .env.example: `$ cp .env.example .env`
-3. Install your database engine and create your database, depending on your database you have to create a DATABASE_URL variable with one of the possible values, make sure you replace the valudes with your database information:
+Desván es una web enfocada en los típicos garage sales de Estados Unidos: mercadillos, casas abiertas y ventas de garaje donde personas y comunidades publican eventos para vender objetos de segunda mano, antigüedades y curiosidades.
 
-| Engine    | DATABASE_URL                                        |
-| --------- | --------------------------------------------------- |
-| SQLite    | sqlite:////test.db                                  |
-| MySQL     | mysql://username:password@localhost:port/example    |
-| Postgress | postgres://username:password@localhost:5432/example |
+Los usuarios pueden explorar eventos creados por otras personas (open houses, community yard sales, mercadillos) o crear sus propios eventos para publicar artículos y organizar ventas en su barrio. Cada evento tiene página detallada con galería, ubicación en mapa, y opciones para reservar/mostrar interés o guardar en favoritos.
 
-4. Migrate the migrations: `$ pipenv run migrate` (skip if you have not made changes to the models on the `./src/api/models.py`)
-5. Run the migrations: `$ pipenv run upgrade`
-6. Run the application: `$ pipenv run start`
+Se diseñó con foco en:
 
-> Note: Codespaces users can connect to psql by typing: `psql -h localhost -U gitpod example`
+- Facilitar la creación y descubrimiento de garage sales y ventas de barrio.
+- Experiencias visuales modernas y tipografía cuidada.
+- Fluidez en navegación cliente/servidor (SPA con React Router) y API REST en Flask para autenticación y persistencia.
 
-### Undo a migration
+## Características principales
 
-You are also able to undo a migration by running
+- Navegación SPA con rutas para lista de eventos, creación de eventos y detalle.
+- Exploración de garage sales, open houses y mercadillos creados por la comunidad.
+- Publicación de eventos propios para ventas de garaje, casas abiertas y mercadillos locales.
+- Páginas de evento con galería, mapa, detalles de ubicación y acciones (guardar, compartir, reservar/interesar).
+- Área de cuenta con perfil, favoritos, reservas y eventos propios.
+- Backend RESTful con endpoints para autenticación, eventos, reservas y gestión de usuarios.
 
-```sh
-$ pipenv run downgrade
+## Tecnología
+
+- Frontend: React 18, Vite, React Router
+- Backend: Python, Flask, Flask-Migrate, Flask-JWT-Extended
+- Base de datos: SQLite (por defecto) / PostgreSQL (recomendada en producción)
+- Estilos: CSS moderno con variables (Space Grotesk y DM Serif Text)
+
+## Instalación rápida (entorno de desarrollo)
+
+Requisitos:
+
+- Node.js v20+
+- Python 3.10+
+
+1. Instalar dependencias del backend
+
+```bash
+python -m pip install -r requirements.txt
 ```
 
-### Backend Populate Table Users
+2. Levantar el servidor backend (forma directa)
 
-To insert test users in the database execute the following command:
-
-```sh
-$ flask insert-test-users 5
-```
-
-And you will see the following message:
+```bash
+python src/app.py
 
 ```
-  Creating test users
-  test_user1@test.com created.
-  test_user2@test.com created.
-  test_user3@test.com created.
-  test_user4@test.com created.
-  test_user5@test.com created.
-  Users created successfully!
+
+3. Instalar y levantar el frontend
+
+```bash
+npm install
+npm run dev
+
 ```
 
-### **Important note for the database and the data inside it**
+## Variables de entorno importantes
 
-Every Github codespace environment will have **its own database**, so if you're working with more people eveyone will have a different database and different records inside it. This data **will be lost**, so don't spend too much time manually creating records for testing, instead, you can automate adding records to your database by editing ```commands.py``` file inside ```/src/api``` folder. Edit line 32 function ```insert_test_data``` to insert the data according to your model (use the function ```insert_test_users``` above as an example). Then, all you need to do is run ```pipenv run insert-test-data```.
+- `DATABASE_URL` — URL de conexión a la base de datos (postgres/mysql/sqlite)
+- `JWT_SECRET_KEY` — clave secreta para tokens JWT en el backend
 
-### Front-End Manual Installation:
+Puedes crear un archivo `.env` en la raíz para tus variables.
 
--   Make sure you are using node version 20 and that you have already successfully installed and runned the backend.
+## Estructura relevante del proyecto
 
-1. Install the packages: `$ npm install`
-2. Start coding! start the webpack dev server `$ npm run start`
+- `src/front/` — código del frontend (React)
+- `src/api/` — rutas, modelos y comandos del backend
+- `src/app.py` — arranque del servidor Flask
+- `public/` — assets estáticos para producción
 
-## Publish your website!
+## Autores
 
-This boilerplate it's 100% read to deploy with Render.com and Heroku in a matter of minutes. Please read the [official documentation about it](https://4geeks.com/docs/start/deploy-to-render-com).
+- Jose Manuel Baena — (https://github.com/JoseBaena97)
+- Alicia López — (https://github.com/Alicia2202)
 
-### Contributors
-
-This template was built as part of the 4Geeks Academy [Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) by [Alejandro Sanchez](https://twitter.com/alesanchezr) and many other contributors. Find out more about our [Full Stack Developer Course](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer), and [Data Science Bootcamp](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning).
-
-You can find other templates and resources like this at the [school github page](https://github.com/4geeksacademy/).
+---
