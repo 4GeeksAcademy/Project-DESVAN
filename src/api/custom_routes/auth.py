@@ -154,7 +154,7 @@ def forgot_password():
     user.reset_token = token
 
     user.reset_token_expires = (
-        datetime.now(timezone.utc)
+        datetime.now(timezone.utc).replace(tzinfo=None)
         + timedelta(hours=1)
     )
 
